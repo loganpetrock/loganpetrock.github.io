@@ -1,12 +1,6 @@
 @import url(fontawesome-all.min.css);
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300italic,600italic,300,600");
 
-/*
-	Dimension by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-*/
-
 html, body, div, span, applet, object,
 iframe, h1, h2, h3, h4, h5, h6, p, blockquote,
 pre, a, abbr, acronym, address, big, cite,
@@ -1697,7 +1691,8 @@ input, select, textarea {
   #header .content p {
     font-size: 0.75rem;
     letter-spacing: 0.1rem;
-    line-height: 1.8;
+    line-height: 1.5;
+	margin: 0.5rem 0 0;
   }
 
   #header nav ul {
@@ -1725,4 +1720,13 @@ input, select, textarea {
     top: -1.25rem;   /* shift it up appropriately */
   }
 }
+
+#header .content p {
+  line-height: 1.5;           /* tighter spacing between the two lines */
+  margin: 0.5rem 0 0 0;        /* remove excessive top/bottom margin */
+  font-size: 0.8rem;           /* adjust size if needed */
+  letter-spacing: 0.2rem;      /* optional, looks clean with uppercase */
+  text-transform: uppercase;   /* match your design */
+}
+
 

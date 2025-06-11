@@ -1709,24 +1709,23 @@ input, select, textarea {
     width: 100%;
     padding: 0.75rem 0;
   }
-
-  /* Tweak vertical spacing between header blocks */
+	
   #header > *:not(:first-child) {
     margin-top: 1.25rem !important;
   }
 
   #header > *:before {
-    height: 1.25rem; /* shorter line */
-    top: -1.25rem;   /* shift it up appropriately */
+    height: 1.25rem; 
+    top: -1.25rem;   
   }
 }
 
 #header .content p {
-  line-height: 1.5;           /* tighter spacing between the two lines */
-  margin: 0.5rem 0 0 0;        /* remove excessive top/bottom margin */
-  font-size: 0.8rem;           /* adjust size if needed */
-  letter-spacing: 0.2rem;      /* optional, looks clean with uppercase */
-  text-transform: uppercase;   /* match your design */
+  line-height: 1.5;           
+  margin: 0.5rem 0 0 0;        
+  font-size: 0.8rem;           
+  letter-spacing: 0.2rem;      
+  text-transform: uppercase;   
 }
 
 

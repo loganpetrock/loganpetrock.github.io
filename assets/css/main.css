@@ -1696,34 +1696,39 @@ input, select, textarea {
   }
 
   #header nav ul {
+    align-items: center;
+    justify-content: center;
+    display: flex;
     flex-direction: column;
-    width: 100%;
+    padding: 0;
   }
 
   #header nav ul li {
     width: 100%;
     text-align: center;
+    padding: 0;
   }
 
-  #header nav ul li a {
+  #header nav ul li {
     width: 100%;
-    padding: 0.75rem 0;
+    text-align: center;
+    padding: 0;
   }
-	
+
   #header > *:not(:first-child) {
     margin-top: 1.25rem !important;
   }
 
   #header > *:before {
-    height: 1.25rem; 
-    top: -1.25rem;   
+    height: 1.25rem;
+    top: -1.25rem; 
   }
 }
 
 #header .content p {
-  line-height: 1.5;           
-  margin: 0.5rem 0 0 0;        
-  font-size: 0.8rem;           
-  letter-spacing: 0.2rem;      
-  text-transform: uppercase;   
+  line-height: 1.5; 
+  margin: 0.5rem 0 0 0;  
+  font-size: 0.8rem;  
+  letter-spacing: 0.2rem;  
+  text-transform: uppercase; 
 }

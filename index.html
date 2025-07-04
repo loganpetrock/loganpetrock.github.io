@@ -1,91 +1,88 @@
-//Javascript code for a simple calculator to go along with HTML and CSS
+<html>
+	<head>
+		<title>Logan Petrock</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
 
-let runningTotal = 0;
-let buffer = "0";
-let previousOperator;
+		<!-- Wrapper -->
+			<div id="wrapper">
 
-const screen = document.querySelector(".screen");
+				<!-- Header -->
+					<header id="header">
+						<span class="logo">
+							<img src="images/face.jpg" alt="My Face" />
+						</span>
+						<div class="content">
+							<div class="inner">
+								<h1>Logan Petrock</h1>
+								<p>Computer Engineering @ UIUC.</p>
+								<p>Aspiring AI/ML Developer.</p>
+							</div>
+						</div>
+						<nav>
+							<ul>
+								<li>
+									<a href="https://www.linkedin.com/in/logan-petrock-a68ab727b/" target="_blank" class="button">
+										LinkedIn
+									</a>
+								</li>
+								<li>
+									<a href="https://github.com/loganpetrock" target="_blank" class="button">
+										GitHub
+									</a>
+								</li>
+							</ul>
+						</nav>
+		
+					</header>
 
-function buttonClick(value) {
-    if (isNaN(value)) {
-        handleSymbol(value);
-    } else {
-        handleNumber(value);
-    }
-    screen.innerText = buffer;
-}
+				<!-- Main -->
+					<div id="main">
 
-function handleSymbol(symbol) {
-    switch(symbol) {
-        case "C":
-            buffer = "0";
-            runningTotal = 0;
-            break;
-        case "=":
-            if (previousOperator === null) {
-                return;
-            }
-            flushOperation(parseInt(buffer));
-            previousOperator = null;
-            buffer = runningTotal;
-            runningTotal = 0;
-            break;
-        case "←":
-            if (buffer.length === 1) {
-                buffer = "0";
-            } else {
-                buffer = buffer.substring(0, buffer.length - 1);
-            }
-            break;
-        case '+':
-        case '−':
-        case '×':
-        case '÷':
-            handleMath(symbol);
-            break;
-    }
-}
+						<!-- Intro -->
+							<article id="intro">
+								<h2 class="major">Intro</h2>
+								<span class="image main"><img src="images/pic01.jpg" alt="" /></span>
+								<p>Aenean ornare velit lacus, ac varius enim ullamcorper eu. Proin aliquam facilisis ante interdum congue. Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec lacinia. Nam maximus erat id euismod egestas. By the way, check out my <a href="#work">awesome work</a>.</p>
+								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dapibus rutrum facilisis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Etiam tristique libero eu nibh porttitor fermentum. Nullam venenatis erat id vehicula viverra. Nunc ultrices eros ut ultricies condimentum. Mauris risus lacus, blandit sit amet venenatis non, bibendum vitae dolor. Nunc lorem mauris, fringilla in aliquam at, euismod in lectus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In non lorem sit amet elit placerat maximus. Pellentesque aliquam maximus risus, vel sed vehicula.</p>
+							</article>
 
-function handleMath(symbol) {
-    if (buffer === "0") {
-        return;
-    }
+						<!-- Work -->
+							<article id="work">
+								<h2 class="major">Work</h2>
+								<span class="image main"><img src="images/pic02.jpg" alt="" /></span>
+								<p>Adipiscing magna sed dolor elit. Praesent eleifend dignissim arcu, at eleifend sapien imperdiet ac. Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula lacinia quam. Integer sollicitudin mauris nec lorem luctus ultrices.</p>
+								<p>Nullam et orci eu lorem consequat tincidunt vivamus et sagittis libero. Mauris aliquet magna magna sed nunc rhoncus pharetra. Pellentesque condimentum sem. In efficitur ligula tate urna. Maecenas laoreet massa vel lacinia pellentesque lorem ipsum dolor. Nullam et orci eu lorem consequat tincidunt. Vivamus et sagittis libero. Mauris aliquet magna magna sed nunc rhoncus amet feugiat tempus.</p>
+							</article>
 
-    const intBuffer = parseInt(buffer);
+						<!-- About -->
+							<article id="about">
+								<h2 class="major">About</h2>
+								<span class="image main"><img src="images/pic03.jpg" alt="" /></span>
+								<p>Lorem ipsum dolor sit amet, consectetur et adipiscing elit. Praesent eleifend dignissim arcu, at eleifend sapien imperdiet ac. Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula lacinia quam. Integer sollicitudin mauris nec lorem luctus ultrices. Aliquam libero et malesuada fames ac ante ipsum primis in faucibus. Cras viverra ligula sit amet ex mollis mattis lorem ipsum dolor sit amet.</p>
 
-    if (runningTotal === 0) {
-        runningTotal = intBuffer;
-    } else {
-        flushOperation(intBuffer);
-    }
-    previousOperator = symbol;
-    buffer = "0";
-}
+					</div>
 
-function flushOperation(intBuffer) {
-    if (previousOperator === "+") {
-        runningTotal += intBuffer;
-    } else if (previousOperator === "−") {
-        runningTotal -= intBuffer;
-    } else if (previousOperator === "×") {
-        runningTotal *= intBuffer;
-    } else if (previousOperator === "÷") {
-        runningTotal /= intBuffer;
-    }
-}
+				<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Logan Petrock. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
 
-function handleNumber(numberString) {
-    if (buffer === "0") {
-        buffer = numberString;
-    } else {
-        buffer += numberString;
-    }
-}
+			</div>
 
-function init() {
-    document.querySelector(".calc-buttons").addEventListener("click", function(event){
-        buttonClick(event.target.innerText);
-    })
-}
+		<!-- BG -->
+			<div id="bg"></div>
 
-init();
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

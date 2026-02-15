@@ -1,88 +1,413 @@
-<html>
-	<head>
-		<title>Logan Petrock</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-	</head>
-	<body class="is-preload">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logan Petrock | petrock.dev</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #010103;
+            --planet-color: #1a1b3a;
+            --accent: #9d8df1;
+            --text: #ffffff;
+            --subtext: #94a3b8;
+            --glass: rgba(10, 10, 20, 0.85);
+            --border: rgba(255, 255, 255, 0.1);
+        }
 
-		<!-- Wrapper -->
-			<div id="wrapper">
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-				<!-- Header -->
-					<header id="header">
-						<span class="logo">
-							<img src="images/face.jpg" alt="My Face" />
-						</span>
-						<div class="content">
-							<div class="inner">
-								<h1>Logan Petrock</h1>
-								<p>Computer Engineering @ UIUC.</p>
-							</div>
-						</div>
-						<nav>
-							<ul>
-								<li>
-									<a href="https://www.linkedin.com/in/logan-petrock-a68ab727b/" target="_blank" class="button">
-										LinkedIn
-									</a>
-								</li>
-								<li>
-									<a href="https://github.com/loganpetrock" target="_blank" class="button">
-										GitHub
-									</a>
-								</li>
-							</ul>
-						</nav>
-		
-					</header>
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            height: 250vh; 
+        }
 
-				<!-- Main -->
-					<div id="main">
+        #universe {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -3;
+            background: radial-gradient(circle at 70% 30%, #0d0d2b 0%, #010103 100%);
+        }
 
-						<!-- Intro -->
-							<article id="intro">
-								<h2 class="major">Intro</h2>
-								<span class="image main"><img src="images/pic01.jpg" alt="" /></span>
-								<p>Aenean ornare velit lacus, ac varius enim ullamcorper eu. Proin aliquam facilisis ante interdum congue. Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec lacinia. Nam maximus erat id euismod egestas. By the way, check out my <a href="#work">awesome work</a>.</p>
-								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dapibus rutrum facilisis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Etiam tristique libero eu nibh porttitor fermentum. Nullam venenatis erat id vehicula viverra. Nunc ultrices eros ut ultricies condimentum. Mauris risus lacus, blandit sit amet venenatis non, bibendum vitae dolor. Nunc lorem mauris, fringilla in aliquam at, euismod in lectus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In non lorem sit amet elit placerat maximus. Pellentesque aliquam maximus risus, vel sed vehicula.</p>
-							</article>
+        /* --- ANDROMEDA --- */
+        .andromeda-container {
+            position: fixed;
+            top: 10%; left: 5%;
+            width: 450px; height: 200px;
+            transform: rotate(-25deg) skewX(-10deg);
+            z-index: -3;
+            filter: blur(25px);
+            opacity: 0.6;
+            will-change: transform, opacity;
+        }
+        .galaxy-spiral {
+            position: absolute; width: 100%; height: 100%;
+            background: radial-gradient(ellipse at center, rgba(157, 141, 241, 0.3) 0%, rgba(68, 68, 255, 0.1) 60%, transparent 80%);
+        }
+        .galaxy-core {
+            position: absolute; top: 50%; left: 50%;
+            width: 70px; height: 30px;
+            background: #fff; border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 40px 10px #fff;
+            opacity: 0.9;
+        }
 
-						<!-- Work -->
-							<article id="work">
-								<h2 class="major">Work</h2>
-								<span class="image main"><img src="images/pic02.jpg" alt="" /></span>
-								<p>Adipiscing magna sed dolor elit. Praesent eleifend dignissim arcu, at eleifend sapien imperdiet ac. Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula lacinia quam. Integer sollicitudin mauris nec lorem luctus ultrices.</p>
-								<p>Nullam et orci eu lorem consequat tincidunt vivamus et sagittis libero. Mauris aliquet magna magna sed nunc rhoncus pharetra. Pellentesque condimentum sem. In efficitur ligula tate urna. Maecenas laoreet massa vel lacinia pellentesque lorem ipsum dolor. Nullam et orci eu lorem consequat tincidunt. Vivamus et sagittis libero. Mauris aliquet magna magna sed nunc rhoncus amet feugiat tempus.</p>
-							</article>
+        /* --- BLACK HOLE --- */
+        .black-hole {
+            position: fixed;
+            top: 60px; right: 10%;
+            width: 140px; height: 140px;
+            z-index: -3;
+            opacity: 0.8;
+            will-change: transform, opacity;
+        }
+        .bh-ring {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 60% 70%, #fff 0%, #ffaa00 15%, #ff4400 35%, #661100 55%, transparent 70%);
+            filter: blur(10px);
+            box-shadow: 0 0 30px #ff3300;
+        }
+        .bh-void {
+            position: absolute; top: 50%; left: 50%;
+            width: 36px; height: 36px;
+            background: #000; border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px #000;
+        }
 
-						<!-- About -->
-							<article id="about">
-								<h2 class="major">About</h2>
-								<span class="image main"><img src="images/pic03.jpg" alt="" /></span>
-								<p>Lorem ipsum dolor sit amet, consectetur et adipiscing elit. Praesent eleifend dignissim arcu, at eleifend sapien imperdiet ac. Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula lacinia quam. Integer sollicitudin mauris nec lorem luctus ultrices. Aliquam libero et malesuada fames ac ante ipsum primis in faucibus. Cras viverra ligula sit amet ex mollis mattis lorem ipsum dolor sit amet.</p>
+        /* --- JAGGED ROCKS & STARS --- */
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--duration) infinite; z-index: -2; }
+        .pet-rock { 
+            position: absolute; background: #1c1c24; 
+            box-shadow: inset -10px -10px 20px #000, 5px 5px 15px rgba(0,0,0,0.4);
+            z-index: -2; 
+        }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-					</div>
+        /* --- PLANET --- */
+        .planet-container {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            width: 650px; height: 650px;
+            pointer-events: none;
+        }
+        .planet {
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at 35% 35%, var(--planet-color), #010103);
+            border-radius: 50%;
+            box-shadow: inset -50px -50px 100px rgba(0,0,0,0.95), 0 0 30px rgba(157, 141, 241, 0.05);
+        }
 
-				<!-- Footer -->
-					<footer id="footer">
-						<p class="copyright">&copy; Logan Petrock. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
-					</footer>
+        /* --- HEADER --- */
+        .hero-content {
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100; 
+            pointer-events: none;
+            will-change: transform, top;
+        }
+        h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 700; letter-spacing: -0.04em; color: #fff; line-height: 1; }
+        .major { font-size: 0.95rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5em; margin-top: 15px; font-weight: 500; }
 
-			</div>
+        /* --- ROCKET --- */
+        #rocket-ship {
+            position: fixed;
+            bottom: 50px; left: -600px;
+            z-index: 150; 
+            width: 400px;
+            pointer-events: none;
+        }
+        
+        /* --- RAPTOR ENGINE (FIXED) --- */
+		.thrust-system {
+			position: absolute;
+			/* Move it so it starts INSIDE the engine bell */
+			left: 25px; 
+			top: 52%; 
+			transform: translate(-100%, -50%);
+			width: 250px; 
+			height: 30px; /* Narrower for a tighter beam */
+			z-index: -1;
+			opacity: 0.9;
+			/* This transition smooths out any size changes */
+			transition: width 0.2s ease-out; 
+		}
 
-		<!-- BG -->
-			<div id="bg"></div>
+		.fire {
+			width: 100%; height: 100%;
+			/* Soft capsule shape instead of a hard polygon */
+			border-radius: 50px 0 0 50px; 
+			
+			/* The Raptor Gradient: White/Cyan (Hot) -> Purple -> Transparent */
+			background: linear-gradient(to left, 
+				transparent 0%, 
+				rgba(120, 50, 255, 0.3) 40%, 
+				rgba(100, 180, 255, 0.8) 70%, 
+				rgba(255, 255, 255, 1) 100%
+			);
+			
+			/* Heavy blur to kill the blocky edges */
+			filter: blur(8px);
+			
+			/* Pulse animation */
+			animation: enginePulse 0.1s infinite alternate;
+		}
 
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
+		/* The Shock Diamonds (Rings in the flame) */
+		.fire::after {
+			content: '';
+			position: absolute;
+			top: 0; bottom: 0; right: 0; left: 0;
+			
+			/* Soft repeating dashes */
+			background: repeating-linear-gradient(to left,
+				transparent 0%,
+				rgba(255, 255, 255, 0.4) 10%, 
+				rgba(255, 255, 255, 0.8) 15%, 
+				rgba(255, 255, 255, 0.4) 20%, 
+				transparent 25%
+			);
+			
+			/* Blend mode to make them look like light */
+			mix-blend-mode: overlay;
+			border-radius: 50px 0 0 50px;
+		}
 
-	</body>
+		@keyframes enginePulse { 
+			0% { transform: scaleY(0.9); opacity: 0.9; } 
+			100% { transform: scaleY(1.1); opacity: 1; } 
+		}
+
+        /* --- DOCK --- */
+        .nav-dock-container {
+            position: fixed;
+            bottom: 40px; left: 0; width: 100%;
+            display: flex; justify-content: center; z-index: 200;
+        }
+        .nav-dock {
+            display: flex; background: var(--glass); backdrop-filter: blur(25px);
+            padding: 12px 28px; border-radius: 35px; border: 1px solid var(--border);
+            transform: translateY(150px); opacity: 0;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .nav-dock.visible { transform: translateY(0); opacity: 1; }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-decoration: none; color: var(--text); width: 85px; height: 85px; border-radius: 20px; transition: 0.3s ease;
+        }
+        .nav-item i { color: var(--accent); margin-bottom: 6px; }
+        .nav-item span { font-size: 0.75rem; color: var(--subtext); }
+        .nav-item:hover { background: rgba(255,255,255,0.05); transform: translateY(-5px); }
+
+        /* --- SCROLL HINT --- */
+        .scroll-hint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: #fff;
+            opacity: 0.7;
+            z-index: 100;
+            pointer-events: none;
+            transition: opacity 0.1s ease;
+        }
+
+        .takeoff {
+            background: linear-gradient(90deg, #ff4400, #ff8c00, #ff4400);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            animation: wave 2s linear infinite;
+        }
+
+        @keyframes wave {
+            to { background-position: 200% center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="universe">
+        <div class="andromeda-container" id="andromeda">
+            <div class="galaxy-spiral"></div>
+            <div class="galaxy-core"></div>
+        </div>
+        <div class="black-hole" id="blackHole">
+            <div class="bh-ring"></div>
+            <div class="bh-void"></div>
+        </div>
+    </div>
+
+    <div class="planet-container" id="planetCont">
+        <div class="planet"></div>
+    </div>
+
+    <div id="rocket-ship">
+    <div class="thrust-system" id="engine">
+        <div class="fire"></div>
+    </div>
+    
+		<svg viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
+			<defs>
+				<linearGradient id="steelBody" x1="0%" y1="0%" x2="0%" y2="100%">
+					<stop offset="0%" stop-color="#cbd5e1" /> <stop offset="40%" stop-color="#94a3b8" /> <stop offset="50%" stop-color="#64748b" /> <stop offset="60%" stop-color="#475569" /> <stop offset="100%" stop-color="#1e293b" /> </linearGradient>
+				
+				<linearGradient id="flapGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+					<stop offset="0%" stop-color="#94a3b8" />
+					<stop offset="100%" stop-color="#475569" />
+				</linearGradient>
+			</defs>
+
+			<path d="M40 110 L120 110 L100 160 C80 165, 40 140, 40 110 Z" fill="url(#flapGrad)" stroke="#334155" stroke-width="1"/>
+
+			<path d="M20 60 L360 60 C440 60, 480 90, 490 100 C480 110, 440 140, 360 140 L20 140 C15 140, 10 100, 20 60 Z" fill="url(#steelBody)" />
+			
+			<path d="M22 130 L360 130 C400 130, 430 120, 450 115 L25 115 Z" fill="rgba(0,0,0,0.3)" />
+
+			<path d="M350 80 L420 80 L440 60 C430 50, 360 60, 350 80 Z" fill="url(#flapGrad)" stroke="#334155" stroke-width="1"/>
+			<path d="M350 120 L420 120 L440 140 C430 150, 360 140, 350 120 Z" fill="#1e293b" />
+
+			<path d="M40 90 L120 90 L100 40 C80 35, 40 60, 40 90 Z" fill="url(#flapGrad)" stroke="#334155" stroke-width="1"/>
+
+			<path d="M20 85 L10 80 L10 120 L20 115 Z" fill="#1e1e1e" />
+			<rect x="18" y="70" width="5" height="60" fill="#333" />
+			
+			<rect x="130" y="60" width="1" height="80" fill="rgba(0,0,0,0.1)" />
+			<rect x="240" y="60" width="1" height="80" fill="rgba(0,0,0,0.1)" />
+    	</svg>
+	</div>
+
+    <div class="hero-content" id="heroText">
+        <h1>Logan Petrock</h1>
+        <p class="major">Computer Engineering @ UIUC</p>
+    </div>
+
+    <div class="scroll-hint" id="launchHint">SCROLL FOR <span class="takeoff">TAKEOFF</span></div>
+
+    <div class="nav-dock-container">
+        <nav class="nav-dock" id="dock">
+            <a href="https://linkedin.com/in/loganpetrock/" target="_blank" class="nav-item">
+                <i data-lucide="linkedin"></i><span>LinkedIn</span>
+            </a>
+            <a href="https://github.com/loganpetrock" target="_blank" class="nav-item">
+                <i data-lucide="github"></i><span>GitHub</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="layout-grid"></i><span>Projects</span>
+            </a>
+            <a href="mailto:contact@petrock.dev" class="nav-item">
+                <i data-lucide="mail"></i><span>Contact</span>
+            </a>
+            <a href="https://photography.petrock.dev" class="nav-item">
+                <i data-lucide="camera"></i><span>Photography</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const universe = document.getElementById('universe');
+        const rocks = [];
+        for (let i = 0; i < 200; i++) {
+            const s = document.createElement('div');
+            s.className = 'star';
+            s.style.width = Math.random() * 2 + 'px'; s.style.height = s.style.width;
+            s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
+            s.style.setProperty('--duration', (2 + Math.random() * 3) + 's');
+            universe.appendChild(s);
+        }
+
+        const numRocks = 12;
+        for (let i = 0; i < numRocks; i++) {
+            const r = document.createElement('div');
+            r.className = 'pet-rock';
+            const size = 50 + Math.random() * 90;
+            r.style.width = size + 'px'; r.style.height = size + 'px';
+            const zoneWidth = 100 / numRocks;
+            r.style.left = (i * zoneWidth) + (Math.random() * zoneWidth * 0.6) + '%';
+            r.style.top = Math.random() * 100 + '%';
+            const p1 = 20 + Math.random() * 40;
+            const p2 = 60 + Math.random() * 40;
+            r.style.borderRadius = `${p1}% ${p2}% ${p1}% ${p2}% / ${p2}% ${p1}% ${p2}% ${p1}%`;
+            const speed = 0.15 + Math.random() * 0.45;
+            rocks.push({ el: r, speed: speed });
+            universe.appendChild(r);
+        }
+
+        window.addEventListener('scroll', () => {
+            const scroll = window.scrollY;
+            const vH = window.innerHeight;
+            const vW = window.innerWidth;
+            const maxScroll = document.body.scrollHeight - vH;
+            const scrollPct = scroll / maxScroll;
+
+            rocks.forEach(rock => {
+                rock.el.style.transform = `translateY(-${scroll * rock.speed}px) rotate(${scroll * 0.05}deg)`;
+            });
+
+            // Name: Decreases in size slightly as it moves up
+            const hero = document.getElementById('heroText');
+            hero.style.top = (50 - (scrollPct * 40)) + '%';
+            hero.style.transform = `translate(-50%, -50%) scale(${1 - (scrollPct * 0.15)})`;
+
+            // Scroll Hint Logic
+            const launchHint = document.getElementById('launchHint');
+            const hintOpacity = Math.max(0, 0.7 - (scrollPct * 2.33));
+            launchHint.style.opacity = hintOpacity;
+
+            // Andromeda Logic: Scales down and fades
+            const andromeda = document.getElementById('andromeda');
+            const andScale = 1 - (scrollPct * 0.6);
+            andromeda.style.transform = `rotate(-25deg) skewX(-10deg) scale(${andScale})`;
+            andromeda.style.opacity = 0.6 - (scrollPct * 0.4);
+
+            // Black Hole Logic: Scaling smaller on scroll
+            const bh = document.getElementById('blackHole');
+            const bhScale = 1 - (scrollPct * 0.6);
+            bh.style.transform = `scale(${bhScale})`;
+            bh.style.opacity = 0.8 - (scrollPct * 0.4);
+
+            // Planet Fade
+            const planet = document.getElementById('planetCont');
+            planet.style.opacity = Math.max(0, 1 - (scroll / 1000));
+            planet.style.transform = `translate(-50%, -50%) scale(${Math.max(0, 1 - (scroll / 1200))})`;
+
+            // Rocket Path (Centered Y, 55% L-space X, OVER text)
+            const ship = document.getElementById('rocket-ship');
+            const targetX = vW * 0.45; 
+            const targetY = (vH / 2) - 80; 
+            const arc = Math.sin(scrollPct * Math.PI) * 450;
+            ship.style.left = (-600 + (scrollPct * (targetX + 600))) + 'px';
+            ship.style.bottom = (80 + (scrollPct * (targetY - 80)) + arc) + 'px';
+            ship.style.transform = `scale(${0.4 + (scrollPct * 1.6)}) rotate(${-25 + (scrollPct * 30)}deg)`;
+            
+            const engine = document.getElementById('engine');
+            engine.style.opacity = (scrollPct > 0.01) ? "1" : "0.5";
+            engine.style.width = (scrollPct < 1.0) ? "180px" : "180px";
+
+            const dock = document.getElementById('dock');
+            if (scrollPct > 0.35) dock.classList.add('visible');
+            else dock.classList.remove('visible');
+        });
+    </script>
+</body>
 </html>
-

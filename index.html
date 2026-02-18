@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Added viewport-fit=cover for notched phones (iPhone) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Logan Petrock | petrock.dev</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,6 +27,7 @@
             color: var(--text);
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
+            /* Shorter scroll for mobile so it doesn't feel like an endless swipe */
             height: 250vh; 
         }
 
@@ -40,7 +42,8 @@
         .andromeda-container {
             position: fixed;
             top: 10%; left: 5%;
-            width: 450px; height: 200px;
+            width: clamp(200px, 40vw, 450px); /* Responsive Width */
+            height: 200px;
             transform: rotate(-25deg) skewX(-10deg);
             z-index: -3;
             filter: blur(25px);
@@ -64,7 +67,8 @@
         .black-hole {
             position: fixed;
             top: 60px; right: 10%;
-            width: 140px; height: 140px;
+            width: clamp(80px, 15vw, 140px); /* Responsive Width */
+            height: clamp(80px, 15vw, 140px);
             z-index: -3;
             opacity: 0.8;
             will-change: transform, opacity;
@@ -78,10 +82,9 @@
         }
         .bh-void {
             position: absolute; top: 50%; left: 50%;
-            width: 36px; height: 36px;
+            width: 25%; height: 25%;
             background: #000; border-radius: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px #000;
         }
 
         /* --- JAGGED ROCKS & STARS --- */
@@ -93,13 +96,15 @@
         }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-        /* --- PLANET --- */
+        /* --- PLANET (Responsive Fix) --- */
         .planet-container {
             position: fixed;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             z-index: 5;
-            width: 650px; height: 650px;
+            width: 90vw; /* Use vw instead of fixed px */
+            max-width: 650px;
+            aspect-ratio: 1/1;
             pointer-events: none;
         }
         .planet {
@@ -118,115 +123,95 @@
             transform: translate(-50%, -50%);
             z-index: 100; 
             pointer-events: none;
-            will-change: transform, top;
+            padding: 0 20px;
         }
-        h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 700; letter-spacing: -0.04em; color: #fff; line-height: 1; }
-        .major { font-size: 0.95rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5em; margin-top: 15px; font-weight: 500; }
+        h1 { font-size: clamp(2.2rem, 10vw, 4.5rem); font-weight: 700; letter-spacing: -0.04em; color: #fff; line-height: 1; }
+        .major { font-size: clamp(0.7rem, 3vw, 0.95rem); color: var(--accent); text-transform: uppercase; letter-spacing: 0.3em; margin-top: 15px; font-weight: 500; }
 
-        /* --- ROCKET --- */
+        /* --- ROCKET (Responsive Size) --- */
         #rocket-ship {
             position: fixed;
             bottom: 50px; left: -600px;
             z-index: 150; 
-            width: 400px;
+            width: clamp(200px, 40vw, 400px); /* Scaled down for mobile */
             pointer-events: none;
         }
         
-        /* --- RAPTOR ENGINE (FIXED) --- */
-		.thrust-system {
+        .thrust-system {
 			position: absolute;
-			/* Move it so it starts INSIDE the engine bell */
 			left: 25px; 
 			top: 52%; 
 			transform: translate(-100%, -50%);
-			width: 250px; 
-			height: 30px; /* Narrower for a tighter beam */
+			width: 60%; 
+			height: 30px;
 			z-index: -1;
 			opacity: 0.9;
-			/* This transition smooths out any size changes */
 			transition: width 0.2s ease-out; 
 		}
 
 		.fire {
 			width: 100%; height: 100%;
-			/* Soft capsule shape instead of a hard polygon */
 			border-radius: 50px 0 0 50px; 
-			
-			/* The Raptor Gradient: White/Cyan (Hot) -> Purple -> Transparent */
-			background: linear-gradient(to left, 
-				transparent 0%, 
-				rgba(120, 50, 255, 0.3) 40%, 
-				rgba(100, 180, 255, 0.8) 70%, 
-				rgba(255, 255, 255, 1) 100%
-			);
-			
-			/* Heavy blur to kill the blocky edges */
+			background: linear-gradient(to left, transparent 0%, rgba(120, 50, 255, 0.3) 40%, rgba(100, 180, 255, 0.8) 70%, rgba(255, 255, 255, 1) 100%);
 			filter: blur(8px);
-			
-			/* Pulse animation */
 			animation: enginePulse 0.1s infinite alternate;
 		}
 
-		/* The Shock Diamonds (Rings in the flame) */
-		.fire::after {
-			content: '';
-			position: absolute;
-			top: 0; bottom: 0; right: 0; left: 0;
-			
-			/* Soft repeating dashes */
-			background: repeating-linear-gradient(to left,
-				transparent 0%,
-				rgba(255, 255, 255, 0.4) 10%, 
-				rgba(255, 255, 255, 0.8) 15%, 
-				rgba(255, 255, 255, 0.4) 20%, 
-				transparent 25%
-			);
-			
-			/* Blend mode to make them look like light */
-			mix-blend-mode: overlay;
-			border-radius: 50px 0 0 50px;
-		}
-
-		@keyframes enginePulse { 
-			0% { transform: scaleY(0.9); opacity: 0.9; } 
-			100% { transform: scaleY(1.1); opacity: 1; } 
-		}
-
-        /* --- DOCK --- */
+        /* --- DOCK (Mobile Layout Fix) --- */
         .nav-dock-container {
             position: fixed;
-            bottom: 40px; left: 0; width: 100%;
+            bottom: 20px; left: 0; width: 100%;
             display: flex; justify-content: center; z-index: 200;
+            padding: 0 10px;
         }
         .nav-dock {
-            display: flex; background: var(--glass); backdrop-filter: blur(25px);
-            padding: 12px 28px; border-radius: 35px; border: 1px solid var(--border);
+            display: flex; 
+            background: var(--glass); 
+            backdrop-filter: blur(25px);
+            padding: 8px 12px; 
+            border-radius: 24px; 
+            border: 1px solid var(--border);
             transform: translateY(150px); opacity: 0;
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 100%;
+            max-width: 500px;
+            justify-content: space-around; /* Distribute icons evenly */
         }
         .nav-dock.visible { transform: translateY(0); opacity: 1; }
+        
         .nav-item {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-decoration: none; color: var(--text); width: 85px; height: 85px; border-radius: 20px; transition: 0.3s ease;
+            text-decoration: none; color: var(--text); 
+            flex: 1; /* Each takes equal space */
+            min-width: 50px;
+            height: 60px; /* Shorter height for mobile */
+            border-radius: 12px; transition: 0.3s ease;
         }
-        .nav-item i { color: var(--accent); margin-bottom: 6px; }
-        .nav-item span { font-size: 0.75rem; color: var(--subtext); }
-        .nav-item:hover { background: rgba(255,255,255,0.05); transform: translateY(-5px); }
+        .nav-item i { color: var(--accent); margin-bottom: 4px; width: 20px; height: 20px; }
+        .nav-item span { font-size: 0.6rem; color: var(--subtext); font-weight: 500; }
+
+        /* Hide labels on very small screens to avoid crowding */
+        @media (max-width: 360px) {
+            .nav-item span { display: none; }
+            .nav-item { height: 50px; }
+        }
 
         /* --- SCROLL HINT --- */
         .scroll-hint {
             position: fixed;
-            bottom: 30px;
+            bottom: 120px; /* Moved up so it doesn't overlap dock */
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.75rem;
-            letter-spacing: 0.5em;
+            font-size: 0.65rem;
+            letter-spacing: 0.3em;
             text-transform: uppercase;
             color: #fff;
             opacity: 0.7;
             z-index: 100;
             pointer-events: none;
             transition: opacity 0.1s ease;
+            text-align: center;
+            width: 100%;
         }
 
         .takeoff {
@@ -239,9 +224,8 @@
             animation: wave 2s linear infinite;
         }
 
-        @keyframes wave {
-            to { background-position: 200% center; }
-        }
+        @keyframes wave { to { background-position: 200% center; } }
+        @keyframes enginePulse { 0% { transform: scaleY(0.9); opacity: 0.9; } 100% { transform: scaleY(1.1); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -262,35 +246,26 @@
     </div>
 
     <div id="rocket-ship">
-    <div class="thrust-system" id="engine">
-        <div class="fire"></div>
-    </div>
-    
-		<svg viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
+        <div class="thrust-system" id="engine">
+            <div class="fire"></div>
+        </div>
+        <svg viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible; width: 100%; height: auto;">
 			<defs>
 				<linearGradient id="steelBody" x1="0%" y1="0%" x2="0%" y2="100%">
 					<stop offset="0%" stop-color="#cbd5e1" /> <stop offset="40%" stop-color="#94a3b8" /> <stop offset="50%" stop-color="#64748b" /> <stop offset="60%" stop-color="#475569" /> <stop offset="100%" stop-color="#1e293b" /> </linearGradient>
-				
 				<linearGradient id="flapGrad" x1="0%" y1="0%" x2="0%" y2="100%">
 					<stop offset="0%" stop-color="#94a3b8" />
 					<stop offset="100%" stop-color="#475569" />
 				</linearGradient>
 			</defs>
-
 			<path d="M40 110 L120 110 L100 160 C80 165, 40 140, 40 110 Z" fill="url(#flapGrad)" stroke="#334155" stroke-width="1"/>
-
 			<path d="M20 60 L360 60 C440 60, 480 90, 490 100 C480 110, 440 140, 360 140 L20 140 C15 140, 10 100, 20 60 Z" fill="url(#steelBody)" />
-			
 			<path d="M22 130 L360 130 C400 130, 430 120, 450 115 L25 115 Z" fill="rgba(0,0,0,0.3)" />
-
 			<path d="M350 80 L420 80 L440 60 C430 50, 360 60, 350 80 Z" fill="url(#flapGrad)" stroke="#334155" stroke-width="1"/>
 			<path d="M350 120 L420 120 L440 140 C430 150, 360 140, 350 120 Z" fill="#1e293b" />
-
 			<path d="M40 90 L120 90 L100 40 C80 35, 40 60, 40 90 Z" fill="url(#flapGrad)" stroke="#334155" stroke-width="1"/>
-
 			<path d="M20 85 L10 80 L10 120 L20 115 Z" fill="#1e1e1e" />
 			<rect x="18" y="70" width="5" height="60" fill="#333" />
-			
 			<rect x="130" y="60" width="1" height="80" fill="rgba(0,0,0,0.1)" />
 			<rect x="240" y="60" width="1" height="80" fill="rgba(0,0,0,0.1)" />
     	</svg>
@@ -328,7 +303,7 @@
 
         const universe = document.getElementById('universe');
         const rocks = [];
-        for (let i = 0; i < 200; i++) {
+        for (let i = 0; i < 150; i++) {
             const s = document.createElement('div');
             s.className = 'star';
             s.style.width = Math.random() * 2 + 'px'; s.style.height = s.style.width;
@@ -341,7 +316,7 @@
         for (let i = 0; i < numRocks; i++) {
             const r = document.createElement('div');
             r.className = 'pet-rock';
-            const size = 50 + Math.random() * 90;
+            const size = 30 + Math.random() * 60; // Reduced size for mobile
             r.style.width = size + 'px'; r.style.height = size + 'px';
             const zoneWidth = 100 / numRocks;
             r.style.left = (i * zoneWidth) + (Math.random() * zoneWidth * 0.6) + '%';
@@ -365,46 +340,51 @@
                 rock.el.style.transform = `translateY(-${scroll * rock.speed}px) rotate(${scroll * 0.05}deg)`;
             });
 
-            // Name: Decreases in size slightly as it moves up
             const hero = document.getElementById('heroText');
             hero.style.top = (50 - (scrollPct * 40)) + '%';
             hero.style.transform = `translate(-50%, -50%) scale(${1 - (scrollPct * 0.15)})`;
 
-            // Scroll Hint Logic
             const launchHint = document.getElementById('launchHint');
             const hintOpacity = Math.max(0, 0.7 - (scrollPct * 2.33));
             launchHint.style.opacity = hintOpacity;
 
-            // Andromeda Logic: Scales down and fades
             const andromeda = document.getElementById('andromeda');
             const andScale = 1 - (scrollPct * 0.6);
             andromeda.style.transform = `rotate(-25deg) skewX(-10deg) scale(${andScale})`;
             andromeda.style.opacity = 0.6 - (scrollPct * 0.4);
 
-            // Black Hole Logic: Scaling smaller on scroll
             const bh = document.getElementById('blackHole');
             const bhScale = 1 - (scrollPct * 0.6);
             bh.style.transform = `scale(${bhScale})`;
             bh.style.opacity = 0.8 - (scrollPct * 0.4);
 
-            // Planet Fade
             const planet = document.getElementById('planetCont');
-            planet.style.opacity = Math.max(0, 1 - (scroll / 1000));
-            planet.style.transform = `translate(-50%, -50%) scale(${Math.max(0, 1 - (scroll / 1200))})`;
+            planet.style.opacity = Math.max(0, 1 - (scroll / 800));
+            planet.style.transform = `translate(-50%, -50%) scale(${Math.max(0, 1 - (scroll / 1000))})`;
 
-            // Rocket Path (Centered Y, 55% L-space X, OVER text)
+            // --- MOBILE PATH LOGIC ---
             const ship = document.getElementById('rocket-ship');
-            const targetX = vW * 0.45; 
-            const targetY = (vH / 2) - 80; 
-            const arc = Math.sin(scrollPct * Math.PI) * 450;
-            ship.style.left = (-600 + (scrollPct * (targetX + 600))) + 'px';
-            ship.style.bottom = (80 + (scrollPct * (targetY - 80)) + arc) + 'px';
-            ship.style.transform = `scale(${0.4 + (scrollPct * 1.6)}) rotate(${-25 + (scrollPct * 30)}deg)`;
             
-            const engine = document.getElementById('engine');
-            engine.style.opacity = (scrollPct > 0.01) ? "1" : "0.5";
-            engine.style.width = (scrollPct < 1.0) ? "180px" : "180px";
+            // On mobile, let the target X be more centered so the rocket isn't cut off
+            const isMobile = vW < 600;
+            const targetX = isMobile ? (vW * 0.3) : (vW * 0.45); 
+            const targetY = (vH / 2) - (isMobile ? 40 : 80); 
+            
+            // Reduce the arc height for mobile so it doesn't fly off the top of the screen
+            const arcHeight = isMobile ? (vH * 0.35) : 450;
+            const arc = Math.sin(scrollPct * Math.PI) * arcHeight;
+            
+            // Adjust start position so it doesn't take forever to fly in on small screens
+            const startX = isMobile ? -300 : -600;
 
+            ship.style.left = (startX + (scrollPct * (targetX - startX))) + 'px';
+            ship.style.bottom = (80 + (scrollPct * (targetY - 80)) + arc) + 'px';
+            
+            // Scale rocket less on mobile so it doesn't cover the whole screen
+            const rocketScaleBase = isMobile ? 0.3 : 0.4;
+            const rocketScaleMultiplier = isMobile ? 0.8 : 1.6;
+            ship.style.transform = `scale(${rocketScaleBase + (scrollPct * rocketScaleMultiplier)}) rotate(${-25 + (scrollPct * 30)}deg)`;
+            
             const dock = document.getElementById('dock');
             if (scrollPct > 0.35) dock.classList.add('visible');
             else dock.classList.remove('visible');

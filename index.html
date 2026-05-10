@@ -187,7 +187,14 @@
             height: 60px; /* Shorter height for mobile */
             border-radius: 12px; transition: 0.3s ease;
         }
-        .nav-item i { color: var(--accent); margin-bottom: 4px; width: 20px; height: 20px; }
+        .nav-item [data-lucide],
+		.nav-item svg { 
+		    color: var(--accent); 
+		    margin-bottom: 4px; 
+		    width: 20px; 
+		    height: 20px;
+		    stroke-width: 2.5px; /* Optional: Makes them pop more against the space background */
+		}
         .nav-item span { font-size: 0.6rem; color: var(--subtext); font-weight: 500; }
 
         /* Hide labels on very small screens to avoid crowding */

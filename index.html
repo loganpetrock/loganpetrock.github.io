@@ -1,401 +1,76 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <!-- Added viewport-fit=cover for notched phones (iPhone) -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Logan Petrock | petrock.dev</title>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg: #010103;
-            --planet-color: #1a1b3a;
-            --accent: #9d8df1;
-            --text: #ffffff;
-            --subtext: #94a3b8;
-            --glass: rgba(10, 10, 20, 0.85);
-            --border: rgba(255, 255, 255, 0.1);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            /* Shorter scroll for mobile so it doesn't feel like an endless swipe */
-            height: 250vh; 
-        }
-
-        #universe {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -3;
-            background: radial-gradient(circle at 70% 30%, #0d0d2b 0%, #010103 100%);
-        }
-
-        /* --- ANDROMEDA --- */
-        .andromeda-container {
-            position: fixed;
-            top: 10%; left: 5%;
-            width: clamp(200px, 40vw, 450px); /* Responsive Width */
-            height: 200px;
-            transform: rotate(-25deg) skewX(-10deg);
-            z-index: -3;
-            filter: blur(25px);
-            opacity: 0.6;
-            will-change: transform, opacity;
-        }
-        .galaxy-spiral {
-            position: absolute; width: 100%; height: 100%;
-            background: radial-gradient(ellipse at center, rgba(157, 141, 241, 0.3) 0%, rgba(68, 68, 255, 0.1) 60%, transparent 80%);
-        }
-        .galaxy-core {
-            position: absolute; top: 50%; left: 50%;
-            width: 70px; height: 30px;
-            background: #fff; border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 40px 10px #fff;
-            opacity: 0.9;
-        }
-
-        /* --- BLACK HOLE --- */
-        .black-hole {
-            position: fixed;
-            top: 60px; right: 10%;
-            width: clamp(80px, 15vw, 140px); /* Responsive Width */
-            height: clamp(80px, 15vw, 140px);
-            z-index: -3;
-            opacity: 0.8;
-            will-change: transform, opacity;
-        }
-        .bh-ring {
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            background: radial-gradient(circle at 60% 70%, #fff 0%, #ffaa00 15%, #ff4400 35%, #661100 55%, transparent 70%);
-            filter: blur(10px);
-            box-shadow: 0 0 30px #ff3300;
-        }
-        .bh-void {
-            position: absolute; top: 50%; left: 50%;
-            width: 25%; height: 25%;
-            background: #000; border-radius: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* --- JAGGED ROCKS & STARS --- */
-        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--duration) infinite; z-index: -2; }
-        .pet-rock { 
-            position: absolute; background: #1c1c24; 
-            box-shadow: inset -10px -10px 20px #000, 5px 5px 15px rgba(0,0,0,0.4);
-            z-index: -2; 
-        }
-        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-
-        /* --- PLANET (Responsive Fix) --- */
-        .planet-container {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 5;
-            width: 90vw; /* Use vw instead of fixed px */
-            max-width: 650px;
-            aspect-ratio: 1/1;
-            pointer-events: none;
-        }
-        .planet {
-            width: 100%; height: 100%;
-            background: radial-gradient(circle at 35% 35%, var(--planet-color), #010103);
-            border-radius: 50%;
-            box-shadow: inset -50px -50px 100px rgba(0,0,0,0.95), 0 0 30px rgba(157, 141, 241, 0.05);
-        }
-
-        /* --- HEADER --- */
-        .hero-content {
-            text-align: center;
-            position: fixed;
-            width: 100%;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 100; 
-            pointer-events: none;
-            padding: 0 20px;
-        }
-        h1 { font-size: clamp(2.2rem, 10vw, 4.5rem); font-weight: 700; letter-spacing: -0.04em; color: #fff; line-height: 1; }
-        .major { font-size: clamp(0.7rem, 3vw, 0.95rem); color: var(--accent); text-transform: uppercase; letter-spacing: 0.3em; margin-top: 15px; font-weight: 500; }
-
-        /* --- ROCKET (Responsive Size) --- */
-        #rocket-ship {
-            position: fixed;
-            bottom: 50px; left: -600px;
-            z-index: 150; 
-            width: clamp(200px, 40vw, 400px); /* Scaled down for mobile */
-            pointer-events: none;
-        }
-        
-        .thrust-system {
-			position: absolute;
-			left: 25px; 
-			top: 52%; 
-			transform: translate(-100%, -50%);
-			width: 60%; 
-			height: 30px;
-			z-index: -1;
-			opacity: 0.9;
-			transition: width 0.2s ease-out; 
-		}
-
-		.fire {
-			width: 100%; height: 100%;
-			border-radius: 50px 0 0 50px; 
-			background: linear-gradient(to left, transparent 0%, rgba(120, 50, 255, 0.3) 40%, rgba(100, 180, 255, 0.8) 70%, rgba(255, 255, 255, 1) 100%);
-			filter: blur(8px);
-			animation: enginePulse 0.1s infinite alternate;
-		}
-
-        /* --- DOCK (Mobile Layout Fix) --- */
-        .nav-dock-container {
-            position: fixed;
-            bottom: 20px; left: 0; width: 100%;
-            display: flex; justify-content: center; z-index: 200;
-            padding: 0 10px;
-        }
-        .nav-dock {
-            display: flex; 
-            background: var(--glass); 
-            backdrop-filter: blur(25px);
-            padding: 8px 12px; 
-            border-radius: 24px; 
-            border: 1px solid var(--border);
-            transform: translateY(150px); opacity: 0;
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            width: 100%;
-            max-width: 500px;
-            justify-content: space-around; /* Distribute icons evenly */
-        }
-        .nav-dock.visible { transform: translateY(0); opacity: 1; }
-        
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-decoration: none; color: var(--text); 
-            flex: 1; /* Each takes equal space */
-            min-width: 50px;
-            height: 60px; /* Shorter height for mobile */
-            border-radius: 12px; transition: 0.3s ease;
-        }
-        .nav-item [data-lucide],
-		.nav-item svg { 
-		    color: var(--accent); 
-		    margin-bottom: 4px; 
-		    width: 20px; 
-		    height: 20px;
-		    stroke-width: 2.5px; /* Optional: Makes them pop more against the space background */
-		}
-        .nav-item span { font-size: 0.6rem; color: var(--subtext); font-weight: 500; }
-
-        /* Hide labels on very small screens to avoid crowding */
-        @media (max-width: 360px) {
-            .nav-item span { display: none; }
-            .nav-item { height: 50px; }
-        }
-
-        /* --- SCROLL HINT --- */
-        .scroll-hint {
-            position: fixed;
-            bottom: 30px; /* Moved up so it doesn't overlap dock */
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.65rem;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            color: #fff;
-            opacity: 0.7;
-            z-index: 100;
-            pointer-events: none;
-            transition: opacity 0.1s ease;
-            text-align: center;
-            width: 100%;
-        }
-
-        .takeoff {
-            background: linear-gradient(90deg, #ff4400, #ff8c00, #ff4400);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 700;
-            animation: wave 2s linear infinite;
-        }
-
-        @keyframes wave { to { background-position: 200% center; } }
-        @keyframes enginePulse { 0% { transform: scaleY(0.9); opacity: 0.9; } 100% { transform: scaleY(1.1); opacity: 1; } }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111113">
+  <meta name="description" content="Logan Petrock — computer engineering at the University of Illinois Urbana-Champaign. Projects, photography, and a place to get in touch.">
+  <title>Logan Petrock | Computer Engineering & Photography</title>
+  <link rel="canonical" href="https://petrock.dev/">
+  <link rel="icon" type="image/png" href="assets/pet-rock.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="projects.js" defer></script>
+  <script src="contact-config.js" defer></script>
+  <script src="project-render.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-
-    <div id="universe">
-        <div class="andromeda-container" id="andromeda">
-            <div class="galaxy-spiral"></div>
-            <div class="galaxy-core"></div>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="cursor-light" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="wordmark" href="#home" aria-label="Logan Petrock, home"><img src="assets/pet-rock.png" width="48" height="48" alt="Pet rock logo"></a>
+    <nav aria-label="Main navigation">
+      <a href="#home" aria-current="location">Home</a>
+      <a href="/projects/">Projects</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="header-photo" href="https://photography.petrock.dev/" target="_blank" rel="noopener noreferrer">Photography <span aria-hidden="true">↗</span></a>
+  </header>
+  <main id="main">
+    <section class="hero" id="home" aria-labelledby="hero-heading">
+      <div class="horizon" aria-hidden="true"><div class="horizon-glow"></div><div class="horizon-arc"></div></div>
+      <div class="hero-inner wrap">
+        <h1 id="hero-heading" class="intro">Logan Petrock<span class="accent">.</span></h1>
+        <p class="hero-description intro">Building with intention.<br>Capturing with passion.</p>
+        <p class="university intro">Studying computer engineering at the<br class="mobile-break"> <span>University of Illinois Urbana-Champaign.</span></p>
+        <div class="social-links intro">
+          <a class="button" href="https://github.com/loganpetrock" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 19c-4.5 1.4-4.5-2.5-6-3m12 6v-3.9a3.4 3.4 0 0 0-.9-2.7c3-.3 6.2-1.5 6.2-6.9A5.4 5.4 0 0 0 18.8 5 5 5 0 0 0 18.7 1S17.5.6 15 2.5a13.4 13.4 0 0 0-7 0C5.5.6 4.3 1 4.3 1A5 5 0 0 0 4.2 5a5.4 5.4 0 0 0-1.5 3.8c0 5.4 3.2 6.6 6.2 6.9A3.4 3.4 0 0 0 8 18.4V22"/></svg>GitHub <span class="arrow" aria-hidden="true">↗</span></a>
+          <a class="button" href="https://www.linkedin.com/in/-petrock/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="8" width="4" height="13" rx=".5"/><circle cx="5" cy="3" r="2"/><path d="M11 21V8h4v2c1-3 7-3 7 3v8h-4v-7c0-3-3-3-3 0v7z"/></svg>LinkedIn <span class="arrow" aria-hidden="true">↗</span></a>
+          <a class="button" href="https://photography.petrock.dev/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 5l2-3h4l2 3h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><circle cx="12" cy="12" r="4"/></svg>Photography <span class="arrow" aria-hidden="true">↗</span></a>
         </div>
-        <div class="black-hole" id="blackHole">
-            <div class="bh-ring"></div>
-            <div class="bh-void"></div>
-        </div>
-    </div>
-
-    <div class="planet-container" id="planetCont">
-        <div class="planet"></div>
-    </div>
-
-    <div id="rocket-ship">
-        <div class="thrust-system" id="engine">
-            <div class="fire"></div>
-        </div>
-        <svg viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible; width: 100%; height: auto;">
-			<defs>
-				<linearGradient id="steelBody" x1="0%" y1="0%" x2="0%" y2="100%">
-					<stop offset="0%" stop-color="#cbd5e1" /> <stop offset="40%" stop-color="#94a3b8" /> <stop offset="50%" stop-color="#64748b" /> <stop offset="60%" stop-color="#475569" /> <stop offset="100%" stop-color="#1e293b" /> </linearGradient>
-				<linearGradient id="flapGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-					<stop offset="0%" stop-color="#94a3b8" />
-					<stop offset="100%" stop-color="#475569" />
-				</linearGradient>
-			</defs>
-			<path d="M40 110 L120 110 L100 160 C80 165, 40 140, 40 110 Z" fill="url(#flapGrad)" stroke="#334155" stroke-width="1"/>
-			<path d="M20 60 L360 60 C440 60, 480 90, 490 100 C480 110, 440 140, 360 140 L20 140 C15 140, 10 100, 20 60 Z" fill="url(#steelBody)" />
-			<path d="M22 130 L360 130 C400 130, 430 120, 450 115 L25 115 Z" fill="rgba(0,0,0,0.3)" />
-			<path d="M350 80 L420 80 L440 60 C430 50, 360 60, 350 80 Z" fill="url(#flapGrad)" stroke="#334155" stroke-width="1"/>
-			<path d="M350 120 L420 120 L440 140 C430 150, 360 140, 350 120 Z" fill="#1e293b" />
-			<path d="M40 90 L120 90 L100 40 C80 35, 40 60, 40 90 Z" fill="url(#flapGrad)" stroke="#334155" stroke-width="1"/>
-			<path d="M20 85 L10 80 L10 120 L20 115 Z" fill="#1e1e1e" />
-			<rect x="18" y="70" width="5" height="60" fill="#333" />
-			<rect x="130" y="60" width="1" height="80" fill="rgba(0,0,0,0.1)" />
-			<rect x="240" y="60" width="1" height="80" fill="rgba(0,0,0,0.1)" />
-    	</svg>
-	</div>
-
-    <div class="hero-content" id="heroText">
-        <h1>Logan Petrock</h1>
-        <p class="major">Computer Engineering @ UIUC</p>
-    </div>
-
-    <div class="scroll-hint" id="launchHint">SCROLL FOR <span class="takeoff">TAKEOFF</span></div>
-
-    <div class="nav-dock-container">
-        <nav class="nav-dock" id="dock">
-            <a href="https://linkedin.com/in/loganpetrock/" target="_blank" class="nav-item">
-                <i data-lucide="linkedin"></i><span>LinkedIn</span>
-            </a>
-            <a href="https://github.com/loganpetrock" target="_blank" class="nav-item">
-                <i data-lucide="github"></i><span>GitHub</span>
-            </a>
-            <a href="https://projects.petrock.dev" class="nav-item">
-                <i data-lucide="layout-grid"></i><span>Projects</span>
-            </a>
-            <a href="mailto:logan@petrock.dev" class="nav-item">
-                <i data-lucide="mail"></i><span>Contact</span>
-            </a>
-            <a href="https://photography.petrock.dev" class="nav-item">
-                <i data-lucide="camera"></i><span>Photography</span>
-            </a>
-        </nav>
-    </div>
-
-    <script>
-        lucide.createIcons();
-
-        const universe = document.getElementById('universe');
-        const rocks = [];
-        for (let i = 0; i < 150; i++) {
-            const s = document.createElement('div');
-            s.className = 'star';
-            s.style.width = Math.random() * 2 + 'px'; s.style.height = s.style.width;
-            s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
-            s.style.setProperty('--duration', (2 + Math.random() * 3) + 's');
-            universe.appendChild(s);
-        }
-
-        const numRocks = 12;
-        for (let i = 0; i < numRocks; i++) {
-            const r = document.createElement('div');
-            r.className = 'pet-rock';
-            const size = 30 + Math.random() * 60; // Reduced size for mobile
-            r.style.width = size + 'px'; r.style.height = size + 'px';
-            const zoneWidth = 100 / numRocks;
-            r.style.left = (i * zoneWidth) + (Math.random() * zoneWidth * 0.6) + '%';
-            r.style.top = Math.random() * 100 + '%';
-            const p1 = 20 + Math.random() * 40;
-            const p2 = 60 + Math.random() * 40;
-            r.style.borderRadius = `${p1}% ${p2}% ${p1}% ${p2}% / ${p2}% ${p1}% ${p2}% ${p1}%`;
-            const speed = 0.15 + Math.random() * 0.45;
-            rocks.push({ el: r, speed: speed });
-            universe.appendChild(r);
-        }
-
-        window.addEventListener('scroll', () => {
-            const scroll = window.scrollY;
-            const vH = window.innerHeight;
-            const vW = window.innerWidth;
-            const maxScroll = document.body.scrollHeight - vH;
-            const scrollPct = scroll / maxScroll;
-
-            rocks.forEach(rock => {
-                rock.el.style.transform = `translateY(-${scroll * rock.speed}px) rotate(${scroll * 0.05}deg)`;
-            });
-
-            const hero = document.getElementById('heroText');
-            hero.style.top = (50 - (scrollPct * 40)) + '%';
-            hero.style.transform = `translate(-50%, -50%) scale(${1 - (scrollPct * 0.15)})`;
-
-            const launchHint = document.getElementById('launchHint');
-            const hintOpacity = Math.max(0, 0.7 - (scrollPct * 2.33));
-            launchHint.style.opacity = hintOpacity;
-
-            const andromeda = document.getElementById('andromeda');
-            const andScale = 1 - (scrollPct * 0.6);
-            andromeda.style.transform = `rotate(-25deg) skewX(-10deg) scale(${andScale})`;
-            andromeda.style.opacity = 0.6 - (scrollPct * 0.4);
-
-            const bh = document.getElementById('blackHole');
-            const bhScale = 1 - (scrollPct * 0.6);
-            bh.style.transform = `scale(${bhScale})`;
-            bh.style.opacity = 0.8 - (scrollPct * 0.4);
-
-            const planet = document.getElementById('planetCont');
-            planet.style.opacity = Math.max(0, 1 - (scroll / 800));
-            planet.style.transform = `translate(-50%, -50%) scale(${Math.max(0, 1 - (scroll / 1000))})`;
-
-            // --- MOBILE PATH LOGIC ---
-            const ship = document.getElementById('rocket-ship');
-            
-            // On mobile, let the target X be more centered so the rocket isn't cut off
-            const isMobile = vW < 600;
-            const targetX = isMobile ? (vW * 0.3) : (vW * 0.45); 
-            const targetY = (vH / 2) - (isMobile ? 40 : 80); 
-            
-            // Reduce the arc height for mobile so it doesn't fly off the top of the screen
-            const arcHeight = isMobile ? (vH * 0.35) : 450;
-            const arc = Math.sin(scrollPct * Math.PI) * arcHeight;
-            
-            // Adjust start position so it doesn't take forever to fly in on small screens
-            const startX = isMobile ? -300 : -600;
-
-            ship.style.left = (startX + (scrollPct * (targetX - startX))) + 'px';
-            ship.style.bottom = (80 + (scrollPct * (targetY - 80)) + arc) + 'px';
-            
-            // Scale rocket less on mobile so it doesn't cover the whole screen
-            const rocketScaleBase = isMobile ? 0.3 : 0.4;
-            const rocketScaleMultiplier = isMobile ? 0.8 : 1.6;
-            ship.style.transform = `scale(${rocketScaleBase + (scrollPct * rocketScaleMultiplier)}) rotate(${-25 + (scrollPct * 30)}deg)`;
-            
-            const dock = document.getElementById('dock');
-            if (scrollPct > 0.35) dock.classList.add('visible');
-            else dock.classList.remove('visible');
-        });
-    </script>
+      </div>
+      <div class="hero-bottom wrap"><a href="#projects">SCROLL TO EXPLORE <span aria-hidden="true">↓</span></a><span>CHAMPAIGN–URBANA, IL</span></div>
+    </section>
+    <section class="section wrap" id="projects" aria-labelledby="projects-heading">
+      <div class="section-top reveal"><p class="eyebrow"><span>01</span> / PROJECTS</p><a class="text-link" href="/projects/">See all projects <span aria-hidden="true">↗</span></a></div>
+      <h2 class="reveal" id="projects-heading">Projects<span class="accent">.</span></h2>
+      <div id="project-list" class="project-list" data-view="compact"></div>
+      <div id="projects-empty" class="projects-empty reveal"><span class="empty-mark" aria-hidden="true">&lt; / &gt;</span><div><h3>A little more soon.</h3><p>I’m putting together a selection of my projects.<br>In the meantime, you can explore my work on GitHub.</p></div><a class="circle-link" href="https://github.com/loganpetrock" target="_blank" rel="noopener noreferrer" aria-label="Explore Logan’s GitHub">↗</a></div>
+      <noscript><p>Visit <a href="https://github.com/loganpetrock">my GitHub</a> to explore my projects. Enable JavaScript to see project details here.</p></noscript>
+    </section>
+    <section class="photography-section wrap" id="photography" aria-labelledby="photography-heading">
+      <div class="photo-copy reveal"><p class="eyebrow"><span>02</span> / PHOTOGRAPHY</p><h2 id="photography-heading">A different<br> kind of focus<span class="accent">.</span></h2><a class="button photo-button" href="https://photography.petrock.dev/" target="_blank" rel="noopener noreferrer">Explore photography <span class="arrow" aria-hidden="true">↗</span></a><span class="photo-domain">photography.petrock.dev</span></div>
+      <figure class="photo-frame reveal"><a href="https://photography.petrock.dev/" target="_blank" rel="noopener noreferrer" aria-label="Explore Logan Petrock’s photography portfolio"><img src="assets/moon.jpg" width="1833" height="1222" alt="A detailed half-lit moon against a black sky, photographed by Logan Petrock." loading="lazy" decoding="async"></a><figcaption><span>THE MOON / AUGUST 20, 2026</span><span>PHOTOGRAPH BY LOGAN PETROCK</span></figcaption></figure>
+    </section>
+    <section class="section contact-section wrap" id="contact" aria-labelledby="contact-heading">
+      <div class="contact-copy reveal"><p class="eyebrow"><span>03</span> / CONTACT</p><h2 id="contact-heading">Let’s connect<span class="accent">.</span></h2><p>Have a project in mind, an opportunity,<br>or something you’d like to talk about?<br>I’d love to hear from you.</p></div>
+      <form id="contact-form" class="contact-form reveal" aria-describedby="form-status">
+        <fieldset id="contact-fields" disabled>
+          <legend class="sr-only">Send Logan a message</legend>
+          <div class="form-row"><label>Your name<input name="name" autocomplete="name" placeholder="Alex Smith" required minlength="2" maxlength="100"></label><label>Email address<input name="email" type="email" autocomplete="email" placeholder="alex@example.com" required maxlength="254"></label></div>
+          <label>What’s on your mind?<select name="topic" required><option value="" disabled selected>Select a topic</option><option value="project">Project or collaboration</option><option value="opportunity">Career opportunity</option><option value="photography">Photography</option><option value="hello">Just saying hello</option></select></label>
+          <label>Your message<textarea name="message" rows="5" placeholder="Tell me a little about it…" required minlength="20" maxlength="5000"></textarea></label>
+          <div class="honeypot" aria-hidden="true"><label>Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
+          <div id="turnstile-widget"></div>
+          <div class="form-bottom"><span class="privacy-note">Your details are only used to respond<br>to your message.</span><button class="button button-primary" type="submit" id="send-button">Send message <span aria-hidden="true">↗</span></button></div>
+        </fieldset>
+        <p id="form-status" class="form-status" role="status" aria-live="polite">The contact form is opening soon. For now, please connect on <a href="https://www.linkedin.com/in/-petrock/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>.</p>
+        <noscript><p>JavaScript is required for the protected contact form.</p></noscript>
+      </form>
+    </section>
+  </main>
+  <footer class="wrap"><a class="footer-name" href="#home">Logan Petrock<span class="accent">.</span></a><span>© <span id="year">2026</span> Logan Petrock</span><a href="#home">Back to top <span aria-hidden="true">↑</span></a></footer>
 </body>
 </html>
+
+

@@ -1,0 +1,8 @@
+# Keep backend source and local tooling out of the GitHub Pages output.
+exclude:
+  - contact-worker
+  - tests
+  - scripts
+  - README.md
+  - CONTACT-SETUP.md
+  - photography-source.tmp.html

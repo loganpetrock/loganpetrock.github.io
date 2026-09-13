@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "petrock-contact",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-09-12",
+  "workers_dev": true,
+  "vars": {
+    "ALLOWED_ORIGINS": "https://petrock.dev,https://www.petrock.dev",
+    "FROM_EMAIL": "Petrock Contact <contact@notify.petrock.dev>"
+  },
+  "ratelimits": [{
+    "name": "CONTACT_RATE_LIMITER",
+    "namespace_id": "1001",
+    "simple": { "limit": 5, "period": 60 }
+  }]
+}

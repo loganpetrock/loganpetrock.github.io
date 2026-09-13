@@ -1,0 +1,4 @@
+Generated with the built-in image_gen tool, September 12, 2026.
+Asset: assets/pet-rock.png
+
+Use case: logo-brand. Create a single small pet rock mascot logo for Logan Petrock's minimalist developer portfolio. A friendly squat irregular pebble with two tiny eyes, a discreet smile, and just two or three simple angular stone facets. Refined restrained flat graphic silhouette, charcoal fill with clear muted lavender outline and lavender upper facet, readable at 40 pixels. Palette charcoal #111113, lavender #b6a5de, pale lavender #ded4ef. Centered isolated logo filling 85% of a square canvas. Actual transparent background. No lettering, no initials, no accessories, no scenery, no shadow outside silhouette, no mockup. Calm and subtly playful rather than childish.

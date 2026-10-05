@@ -1,7 +1,7 @@
-import {parts,dateKey,addDays,monday,localInstant,formatTime,formatFull} from './time.mjs';
+import {parts,dateKey,addDays,sunday,localInstant,formatTime,formatFull} from './time.mjs';
 const $=id=>document.getElementById(id),config=window.ROCKETLEAGUE_CONFIG;
 const demo=new URLSearchParams(location.search).get('demo')==='1';
-let zone='America/Chicago',week=monday(dateKey(Date.now(),zone)),session='',preview=false,slots=[],requestVersion=0,widget=null;
+let zone='America/Chicago',week=sunday(dateKey(Date.now(),zone)),session='',preview=false,slots=[],requestVersion=0,widget=null;
 let activeBooking=null,loading=0;
 let demoSlots=[1,2,4,5].map((day,i)=>{const start=localInstant(addDays(week,day),i===1?'20:00':'18:00',zone);return{id:`demo-${i}`,start,end:start+(i%2?60:45)*60000,team:i===2?'Example University':null,discord:i===2?'opponent.example':null};});
 const isAdmin=()=>!!session&&!preview;
@@ -16,9 +16,16 @@ async function api(path,method='GET',data,publicView=false){
 function demoAPI(path,method,data,publicView){
   if(path==='/login')return {token:'demo'};
   if(path==='/logout')return {ok:true};
-  if(path==='/admin/status')return {pending:0,configured:true};
+  if(path==='/admin/status')return {pending:0,attempts:0,lastError:'',configured:true};
+  if(path==='/admin/discord-test')return {ok:true};
   if(path.startsWith('/slots?'))return {slots:demoSlots.map(s=>isAdmin()&&!publicView?{...s}:{id:s.id,start:s.start,end:s.end,booked:!!s.team})};
   if(path==='/admin/slots'){if(demoSlots.some(s=>s.start<data.end&&s.end>data.start))throw new Error('This overlaps an existing slot.');demoSlots.push({id:crypto.randomUUID(),start:data.start,end:data.end,team:data.booked?data.team:null,discord:data.booked?data.discord:null});}
+  if(path.match(/^\/admin\/slots\/[^/]+\/edit$/)){
+    const id=path.split('/')[3],slot=demoSlots.find(s=>s.id===id);
+    if(!slot)throw new Error('This slot no longer exists.');
+    if(demoSlots.some(s=>s.id!==id&&s.start<data.end&&s.end>data.start))throw new Error('This overlaps another slot or match.');
+    Object.assign(slot,{start:data.start,end:data.end,...(slot.team?{team:data.team,discord:data.discord}: {})});
+  }
   if(method==='DELETE')demoSlots=demoSlots.filter(s=>s.id!==path.split('/').at(-1));
   if(path==='/book'){const s=demoSlots.find(s=>s.id===data.id);if(!s||s.team)throw new Error('That slot is unavailable.');Object.assign(s,{team:data.team,discord:data.discord});}
   if(path==='/admin/cancel'){const s=demoSlots.find(s=>s.id===data.id);if(s)s.team=null;}
@@ -27,7 +34,20 @@ function demoAPI(path,method,data,publicView){
 function updateAdmin(){
   $('login').hidden=!!session;$('logout').hidden=!session;$('preview').hidden=!session;
   $('preview').textContent=preview?'Return to admin':'Preview public view';$('admin-bar').hidden=!isAdmin();
-  if(isAdmin())api('/admin/status').then(s=>{$('notification-status').textContent=demo?'Preview mode — changes reset when you reload.':!s.configured?'Discord setup is incomplete. Notifications will wait in the queue.':s.pending?`${s.pending} notification(s) waiting for Discord delivery.`:'Discord notifications configured.';}).catch(()=>{});
+  if(isAdmin())api('/admin/status').then(s=>{
+    let message='Discord notifications configured.';
+    if(demo)message='Preview mode — changes reset when you reload.';
+    else if(!s.configured)message='Discord setup is incomplete. Notifications will wait in the queue.';
+    else if(s.pending)message=`${s.pending} notification(s) waiting for Discord delivery.${s.lastError?` Last error: ${discordHint(s.lastError)}`:''}`;
+    $('notification-status').textContent=message;
+  }).catch(()=>{});
+}
+function discordHint(error){
+  if(String(error).includes('50007'))return 'Discord cannot DM this user. Check the user ID, shared server, and server DM privacy setting.';
+  if(String(error).includes('10013'))return 'Discord could not find that user ID.';
+  if(String(error).includes('401'))return 'The bot token is invalid or was reset.';
+  if(String(error).includes('403'))return 'The bot lacks permission to send this message.';
+  return error;
 }
 async function load(quiet=false){
   if(quiet&&loading)return;
@@ -139,13 +159,40 @@ function add(selectedDate,selectedTime){
     if(start<=Date.now())throw new Error('Choose a time in the future.');
     const booked=data.get('kind')==='booked';
     await api('/admin/slots','POST',{start,end,booked,...(booked?{team:data.get('team'),discord:data.get('discord')}: {})});
-    week=monday(data.get('date'));close();await load();updateAdmin();
+    week=sunday(data.get('date'));close();await load();updateAdmin();
   });
 }
-function manage(s){const content=modal(s.team?'Booked match':'Available block');content.append(element('p',`${formatFull(s.start,zone)} – ${formatTime(s.end,zone)}`));if(s.team){content.append(element('p',`Team: ${s.team}\nDiscord: ${s.discord}`,'detail'));if(s.cancel_token){const a=element('a','Private cancellation link','booking-link');a.href=`${location.origin}${location.pathname}#cancel=${s.cancel_token}`;content.append(a);}const reopen=element('button','Cancel booking & reopen slot');reopen.addEventListener('click',()=>confirmAction('Cancel this booking?','The slot will become available again. You’ll receive a Discord notification; please tell the opposing team.',()=>api('/admin/cancel','POST',{id:s.id})));actions(content,reopen);}
+function editSlot(s){
+  const content=modal(s.team?'Edit booked match':'Edit availability'),form=element('form'),local=parts(s.start,zone);
+  content.append(element('p',`Times are in ${zone}.`),form);
+  const date=field(form,'Date','date','date',0);date.value=`${local.year}-${local.month}-${local.day}`;date.min=dateKey(Date.now(),zone);
+  const time=field(form,'Start time','time','time',0);time.value=`${local.hour}:${local.minute}`;
+  const lengthLabel=element('label','Match length'),duration=element('select');duration.name='duration';
+  for(const n of [45,60]){const option=element('option',`${n} minutes`);option.value=n;option.selected=(s.end-s.start)/60000===n;duration.append(option);}
+  lengthLabel.append(duration);form.append(lengthLabel);
+  let team,discord;
+  if(s.team){team=field(form,'Opponent team','team');team.value=s.team;discord=field(form,'Discord username (optional)','discord');discord.required=false;discord.value=s.discord||'';}
+  submit(form,'Save changes',async data=>{
+    const start=localInstant(data.get('date'),data.get('time'),zone),end=start+Number(data.get('duration'))*60000;
+    if(start<=Date.now())throw new Error('Choose a time in the future.');
+    await api(`/admin/slots/${s.id}/edit`,'POST',{start,end,...(s.team?{team:data.get('team'),discord:data.get('discord')}: {})});
+    week=sunday(data.get('date'));close();await load();updateAdmin();
+  });
+}
+function manage(s){const content=modal(s.team?'Booked match':'Available block');content.append(element('p',`${formatFull(s.start,zone)} – ${formatTime(s.end,zone)}`));if(s.team){content.append(element('p',`Team: ${s.team}\nDiscord: ${s.discord||'Not provided'}`,'detail'));if(s.cancel_token){const a=element('a','Private cancellation link','booking-link');a.href=`${location.origin}${location.pathname}#cancel=${s.cancel_token}`;content.append(a);}const reopen=element('button','Cancel booking & reopen slot');reopen.addEventListener('click',()=>confirmAction('Cancel this booking?','The slot will become available again. You’ll receive a Discord notification; please tell the opposing team.',()=>api('/admin/cancel','POST',{id:s.id})));actions(content,reopen);}
+  const edit=element('button','Edit time and details');edit.addEventListener('click',()=>editSlot(s));actions(content,edit);
   const remove=element('button','Delete slot','danger');remove.addEventListener('click',()=>confirmAction('Delete this slot?',s.team?'This cancels the booking and removes availability. Please notify the opposing team.':'This availability block will be removed.',()=>api(`/admin/slots/${s.id}`,'DELETE')));actions(content,remove);
 }
 function confirmAction(title,message,action){const content=modal(title),form=element('form');content.append(element('p',message),form);submit(form,'Confirm',async()=>{await action();close();await load();updateAdmin();});}
+async function testDiscord(){
+  const button=$('discord-test');button.disabled=true;button.textContent='Testing…';
+  try{
+    await api('/admin/discord-test','POST',{});
+    success('Discord DM sent','The bot accepted the test message. Any queued notifications were retried too.');
+  }catch(error){
+    const content=modal('Discord test failed');content.append(element('p',discordHint(error.message)));
+  }finally{button.disabled=false;button.textContent='Test Discord DM';updateAdmin();}
+}
 async function cancellation(){const t=location.hash.match(/^#cancel=([a-f0-9]{64})$/)?.[1];if(!t)return;history.replaceState(null,'',location.pathname+location.search);const content=modal('Your booking');content.append(element('p','Loading booking…'));try{const {slot}=await api('/cancellation','POST',{token:t},true);confirmAction('Cancel this match?',`${slot.team} · ${formatFull(slot.start,zone)}. Cancelling reopens the slot for another team.`,async()=>{await api('/cancel','POST',{token:t},true);});}catch(e){content.replaceChildren(element('h2','Booking unavailable'),element('p',e.message));}}
 $('login').addEventListener('click',()=>{
   const content=modal('Team admin'),form=element('form');
@@ -160,10 +207,10 @@ $('login').addEventListener('click',()=>{
 });
 $('logout').addEventListener('click',async()=>{try{await api('/logout','POST',{});session='';preview=false;updateAdmin();load();}catch(e){$('status').textContent=e.message;}});
 $('preview').addEventListener('click',()=>{preview=!preview;updateAdmin();load();});
-$('add').addEventListener('click',()=>add());$('conflict').addEventListener('click',conflict);$('close').addEventListener('click',close);
+$('add').addEventListener('click',()=>add());$('discord-test').addEventListener('click',testDiscord);$('conflict').addEventListener('click',conflict);$('close').addEventListener('click',close);
 $('modal').addEventListener('cancel',e=>{e.preventDefault();close();});
 for(const [id,delta] of [['previous',-7],['next',7]])$(id).addEventListener('click',()=>{week=addDays(week,delta);load();});
-$('today').addEventListener('click',()=>{week=monday(dateKey(Date.now(),zone));load();});$('refresh').addEventListener('click',()=>load());
+$('today').addEventListener('click',()=>{week=sunday(dateKey(Date.now(),zone));load();});$('refresh').addEventListener('click',()=>load());
 $('timezone').addEventListener('change',e=>{zone=e.target.value;load();});
 window.addEventListener('hashchange',cancellation);
 // Refresh visible calendars without clearing forms or moving the user's scroll.

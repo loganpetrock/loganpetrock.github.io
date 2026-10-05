@@ -3,6 +3,7 @@ export function parts(epoch,zone){return Object.fromEntries(new Intl.DateTimeFor
 export function dateKey(epoch,zone){const p=parts(epoch,zone);return `${p.year}-${p.month}-${p.day}`;}
 export function addDays(date,count){return new Date(Date.parse(date+'T12:00:00Z')+count*86400000).toISOString().slice(0,10);}
 export function monday(date){const day=new Date(date+'T12:00:00Z').getUTCDay();return addDays(date,-((day+6)%7));}
+export function sunday(date){const day=new Date(date+'T12:00:00Z').getUTCDay();return addDays(date,-day);}
 export function localInstant(date,time,zone){
   const desired=Date.parse(`${date}T${time}:00Z`);if(!Number.isFinite(desired))throw new Error('Choose a valid date and time.');
   const offsets=new Set();

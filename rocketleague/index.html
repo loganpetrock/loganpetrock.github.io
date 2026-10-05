@@ -14,7 +14,7 @@
   <main>
     <div id="demo-banner" class="banner" hidden>Interactive preview · Sample data only. Nothing is saved or sent to Discord.</div>
     <section class="intro"><p class="eyebrow">UNIVERSITY OF ILLINOIS · ROCKET LEAGUE</p><h1>Match schedule<span>.</span></h1><p>Pick a time that works for your team!</p></section>
-    <div id="admin-bar" class="admin-bar" hidden><div><strong>Team calendar</strong><span id="notification-status">Manage your availability below.</span></div><button id="add" class="primary">+ Add slot or match</button></div>
+    <div id="admin-bar" class="admin-bar" hidden><div><strong>Team calendar</strong><span id="notification-status">Manage your availability below.</span></div><div class="admin-actions"><button id="discord-test">Test Discord DM</button><button id="add" class="primary">+ Add slot or match</button></div></div>
     <section class="schedule" aria-label="Weekly match schedule">
       <div class="toolbar"><div class="week-nav"><button id="previous" aria-label="Previous week">←</button><button id="next" aria-label="Next week">→</button><h2 id="week-label"></h2><button id="today">Today</button></div><label class="zone-label">All times in <select id="timezone" aria-label="Calendar timezone"><option value="America/Chicago">Central · Chicago</option><option value="America/New_York">Eastern · New York</option><option value="America/Denver">Mountain · Denver</option><option value="America/Los_Angeles">Pacific · Los Angeles</option></select><span id="zone-abbreviation"></span></label></div>
       <div class="legend"><span><i></i>Available</span><span><i class="booked-dot"></i>Booked</span><span id="slot-count"></span></div>

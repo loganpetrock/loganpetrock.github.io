@@ -1,8 +1,10 @@
 # Keep backend source and local tooling out of the GitHub Pages output.
 exclude:
   - contact-worker
+  - rocketleague-worker
   - tests
   - scripts
   - README.md
   - CONTACT-SETUP.md
+  - ROCKETLEAGUE-SETUP.md
   - photography-source.tmp.html

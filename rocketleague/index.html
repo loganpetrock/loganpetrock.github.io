@@ -10,20 +10,20 @@
 </head>
 <body>
   <a class="skip" href="#calendar">Skip to schedule</a>
-  <header><div class="brand"><span class="mark">I<span> / </span>O</span><span>ILLINOIS ORANGE <small>ROCKET LEAGUE</small></span></div><div class="actions"><button id="preview" hidden>Preview public view</button><button id="login">Admin login ↗</button><button id="logout" hidden>Log out</button></div></header>
+  <header><div class="brand"><span>ILLINOIS ORANGE <small>ROCKET LEAGUE</small></span></div><div class="actions"><button id="preview" hidden>Preview public view</button><button id="login">Admin login ↗</button><button id="logout" hidden>Log out</button></div></header>
   <main>
     <div id="demo-banner" class="banner" hidden>Interactive preview · Sample data only. Nothing is saved or sent to Discord.</div>
-    <section class="intro"><p class="eyebrow">UNIVERSITY OF ILLINOIS · ROCKET LEAGUE</p><h1>Find our next<br>match<span>.</span></h1><p>Pick a time. We’ll see you on the pitch.</p><p class="subtle">45- and 60-minute matches. First come, first served.</p></section>
-    <div id="admin-bar" class="admin-bar" hidden><div><strong>Team calendar</strong><span id="notification-status">Manage your availability below.</span></div><button id="add" class="primary">+ Add availability</button></div>
+    <section class="intro"><p class="eyebrow">UNIVERSITY OF ILLINOIS · ROCKET LEAGUE</p><h1>Match schedule<span>.</span></h1><p>Pick a time that works for your team!</p></section>
+    <div id="admin-bar" class="admin-bar" hidden><div><strong>Team calendar</strong><span id="notification-status">Manage your availability below.</span></div><button id="add" class="primary">+ Add slot or match</button></div>
     <section class="schedule" aria-label="Weekly match schedule">
       <div class="toolbar"><div class="week-nav"><button id="previous" aria-label="Previous week">←</button><button id="next" aria-label="Next week">→</button><h2 id="week-label"></h2><button id="today">Today</button></div><label class="zone-label">All times in <select id="timezone" aria-label="Calendar timezone"><option value="America/Chicago">Central · Chicago</option><option value="America/New_York">Eastern · New York</option><option value="America/Denver">Mountain · Denver</option><option value="America/Los_Angeles">Pacific · Los Angeles</option></select><span id="zone-abbreviation"></span></label></div>
       <div class="legend"><span><i></i>Available</span><span><i class="booked-dot"></i>Booked</span><span id="slot-count"></span></div>
       <p id="status" role="status" aria-live="polite"></p>
       <div id="calendar" tabindex="-1"></div>
-      <div class="schedule-bottom"><p>Each block is one match. Select an available block to reserve it.</p><button id="refresh">Refresh schedule ↻</button></div>
+      <div class="schedule-bottom"><p>Choose an available block to book. Schedule updates automatically.</p><button id="refresh">Refresh schedule ↻</button></div>
     </section>
-    <section class="alternative"><div><p class="eyebrow">LET’S FIND A TIME</p><h2>Nothing lining up?</h2><p>Share your team’s availability and we’ll reach out on Discord.</p></div><button id="conflict">Suggest another time ↗</button></section>
-    <footer>Illinois Orange <span>University of Illinois Urbana-Champaign</span></footer>
+    <section class="alternative"><div><h2>Need a different time?</h2><p>Share your team’s availability and we’ll contact you on Discord.</p></div><button id="conflict">Suggest another time ↗</button></section>
+    <footer>University of Illinois Orange Rocket League <span>University of Illinois Urbana-Champaign</span></footer>
   </main>
   <dialog id="modal"><button id="close" class="close" aria-label="Close dialog">×</button><div id="modal-content"></div><p id="modal-error" role="alert"></p></dialog>
 </body></html>

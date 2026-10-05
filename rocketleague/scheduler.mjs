@@ -2,6 +2,7 @@ import {parts,dateKey,addDays,monday,localInstant,formatTime,formatFull} from '.
 const $=id=>document.getElementById(id),config=window.ROCKETLEAGUE_CONFIG;
 const demo=new URLSearchParams(location.search).get('demo')==='1';
 let zone='America/Chicago',week=monday(dateKey(Date.now(),zone)),session='',preview=false,slots=[],requestVersion=0,widget=null;
+let activeBooking=null,loading=0;
 let demoSlots=[1,2,4,5].map((day,i)=>{const start=localInstant(addDays(week,day),i===1?'20:00':'18:00',zone);return{id:`demo-${i}`,start,end:start+(i%2?60:45)*60000,team:i===2?'Example University':null,discord:i===2?'opponent.example':null};});
 const isAdmin=()=>!!session&&!preview;
 function element(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;}
@@ -10,14 +11,14 @@ async function api(path,method='GET',data,publicView=false){
   if(!config.endpoint)throw new Error('Scheduling is not live yet. Please check back soon.');
   const headers={'Content-Type':'application/json'};if(session&&!publicView)headers.Authorization=`Bearer ${session}`;
   const response=await fetch(config.endpoint.replace(/\/$/,'')+path,{method,headers,body:data?JSON.stringify(data):undefined,signal:AbortSignal.timeout(20000)});
-  const result=await response.json();if(!response.ok){if(response.status===401&&session){session='';preview=false;updateAdmin();}throw new Error(result.error||'Unable to connect. Please try again.');}return result;
+  const result=await response.json();if(!response.ok){if(response.status===401&&session){session='';preview=false;updateAdmin();}const error=new Error(result.error||'Unable to connect. Please try again.');error.status=response.status;throw error;}return result;
 }
 function demoAPI(path,method,data,publicView){
   if(path==='/login')return {token:'demo'};
   if(path==='/logout')return {ok:true};
   if(path==='/admin/status')return {pending:0,configured:true};
   if(path.startsWith('/slots?'))return {slots:demoSlots.map(s=>isAdmin()&&!publicView?{...s}:{id:s.id,start:s.start,end:s.end,booked:!!s.team})};
-  if(path==='/admin/slots'){if(demoSlots.some(s=>s.start<data.end&&s.end>data.start))throw new Error('This overlaps an existing slot.');demoSlots.push({id:crypto.randomUUID(),...data,team:null});}
+  if(path==='/admin/slots'){if(demoSlots.some(s=>s.start<data.end&&s.end>data.start))throw new Error('This overlaps an existing slot.');demoSlots.push({id:crypto.randomUUID(),start:data.start,end:data.end,team:data.booked?data.team:null,discord:data.booked?data.discord:null});}
   if(method==='DELETE')demoSlots=demoSlots.filter(s=>s.id!==path.split('/').at(-1));
   if(path==='/book'){const s=demoSlots.find(s=>s.id===data.id);if(!s||s.team)throw new Error('That slot is unavailable.');Object.assign(s,{team:data.team,discord:data.discord});}
   if(path==='/admin/cancel'){const s=demoSlots.find(s=>s.id===data.id);if(s)s.team=null;}
@@ -28,13 +29,30 @@ function updateAdmin(){
   $('preview').textContent=preview?'Return to admin':'Preview public view';$('admin-bar').hidden=!isAdmin();
   if(isAdmin())api('/admin/status').then(s=>{$('notification-status').textContent=demo?'Preview mode — changes reset when you reload.':!s.configured?'Discord setup is incomplete. Notifications will wait in the queue.':s.pending?`${s.pending} notification(s) waiting for Discord delivery.`:'Discord notifications configured.';}).catch(()=>{});
 }
-async function load(){
-  const version=++requestVersion;$('status').textContent='Loading schedule…';
+async function load(quiet=false){
+  if(quiet&&loading)return;
+  const version=++requestVersion;loading++;
+  if(!quiet)$('status').textContent='Loading schedule…';
   const start=Date.parse(week+'T00:00:00Z')-86400000,end=start+9*86400000;
-  try{const data=await api(`/slots?start=${start}&end=${end}`,'GET',undefined,!isAdmin());if(version!==requestVersion)return;slots=data.slots;$('status').textContent='';render();}
-  catch(error){if(version!==requestVersion)return;slots=[];render();$('status').textContent=error.message;}
+  try{
+    const data=await api(`/slots?start=${start}&end=${end}`,'GET',undefined,!isAdmin());if(version!==requestVersion)return;
+    const changed=JSON.stringify(slots)!==JSON.stringify(data.slots);
+    slots=data.slots;$('status').textContent='';
+    if(!quiet||changed)render(quiet);
+    if(activeBooking){
+      const current=slots.find(s=>s.id===activeBooking.id);
+      const unavailable=!current||current.booked||current.team||current.start<=Date.now();
+      activeBooking.button.disabled=!!unavailable||activeBooking.button.dataset.submitting==='true';
+      activeBooking.notice.textContent=unavailable?'This slot is no longer available. Close this form and choose another time.':'';
+    }
+  }
+  catch(error){if(version!==requestVersion)return;if(!quiet){slots=[];render();}$('status').textContent=quiet?'Could not refresh the schedule. Displayed availability may be out of date; retrying automatically.':error.message;}
+  finally{loading--;}
 }
-function render(){
+function render(preservePosition=false){
+  const previousScroll=document.querySelector('.calendar-scroll')?.scrollTop;
+  const focusedSlot=document.activeElement?.dataset.slotId;
+  const focusedInAgenda=!!document.activeElement?.closest('.agenda');
   const labelDate=d=>new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',timeZone:'UTC'}).format(new Date(d+'T12:00Z'));
   $('week-label').textContent=`${labelDate(week)} – ${labelDate(addDays(week,6))}, ${week.slice(0,4)}`;
   $('zone-abbreviation').textContent=new Intl.DateTimeFormat('en-US',{timeZone:zone,timeZoneName:'short'}).formatToParts(localInstant(week,'12:00',zone)).find(p=>p.type==='timeZoneName').value;
@@ -61,20 +79,23 @@ function render(){
     if(!daySlots.length)group.append(element('p','No available slots'));for(const s of daySlots)group.append(slotButton(s));agenda.append(group);
   }
   root.append(scroll,agenda);
-  const first=visible.length?Math.min(...visible.map(s=>Number(parts(s.start,zone).hour))):15;scroll.scrollTop=Math.max(0,first-1)*60;
+  const first=visible.length?Math.min(...visible.map(s=>Number(parts(s.start,zone).hour))):15;
+  scroll.scrollTop=preservePosition&&previousScroll!==undefined?previousScroll:Math.max(0,first-1)*60;
+  if(preservePosition&&focusedSlot){const container=focusedInAgenda?agenda:scroll;const next=[...container.querySelectorAll('[data-slot-id]')].find(el=>el.dataset.slotId===focusedSlot&&!el.disabled);(next||root).focus({preventScroll:true});}
 }
 function slotButton(s){
   const booked=!!(s.booked||s.team),past=s.start<=Date.now();
   const b=element('button',undefined,`slot${booked?' booked':''}${past?' past':''}`);
+  b.dataset.slotId=s.id;
   b.append(element('strong',`${formatTime(s.start,zone)} – ${formatTime(s.end,zone)}`),element('span',booked?(isAdmin()?s.team:'Booked'):`${(s.end-s.start)/60000} min · ${past?'Ended':'Available'}`));
   b.setAttribute('aria-label',`${formatFull(s.start,zone)}, ${(s.end-s.start)/60000} minutes, ${booked?'booked':'available'}`);
   b.disabled=!isAdmin()&&(booked||past);b.addEventListener('click',()=>isAdmin()?manage(s):booking(s));return b;
 }
-function close(){if(widget!==null&&window.turnstile){window.turnstile.remove(widget);widget=null;}$('modal').close();}
+function close(){activeBooking=null;if(widget!==null&&window.turnstile){window.turnstile.remove(widget);widget=null;}$('modal').close();}
 function modal(title){close();$('modal-error').textContent='';const content=$('modal-content'),heading=element('h2',title);heading.id='modal-title';content.replaceChildren(heading);$('modal').setAttribute('aria-labelledby','modal-title');$('modal').showModal();return content;}
 function field(form,label,name,type='text',max=80){const l=element('label',label),input=element(type==='textarea'?'textarea':'input');input.name=name;if(type!=='textarea')input.type=type;input.required=true;if(max)input.maxLength=max;l.append(input);form.append(l);return input;}
 function actions(parent,button){const row=element('div',undefined,'modal-actions');row.append(button);parent.append(row);}
-function submit(form,label,handler){const button=element('button',label,'primary');button.type='submit';actions(form,button);form.addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;$('modal-error').textContent='';try{await handler(new FormData(form));}catch(error){$('modal-error').textContent=error.message;if(widget!==null)window.turnstile?.reset(widget);}finally{button.disabled=false;}});}
+function submit(form,label,handler){const button=element('button',label,'primary');button.type='submit';actions(form,button);form.addEventListener('submit',async e=>{e.preventDefault();if(button.disabled)return;button.disabled=true;button.dataset.submitting='true';$('modal-error').textContent='';try{await handler(new FormData(form));}catch(error){$('modal-error').textContent=error.message;if(widget!==null)window.turnstile?.reset(widget);}finally{delete button.dataset.submitting;button.disabled=!!(activeBooking?.button===button&&activeBooking.notice.textContent);}});return button;}
 function success(title,message){const content=modal(title);content.append(element('p',message));const b=element('button','Done','primary');b.addEventListener('click',close);content.append(b);load();}
 let challengePromise;
 function challenge(form){
@@ -85,21 +106,70 @@ function challenge(form){
   challengePromise.then(()=>{if(!container.isConnected)return;container.textContent='';widget=window.turnstile.render(container,{sitekey:config.siteKey,theme:'dark',size:'flexible',action:'rocketleague'});}).catch(e=>{$('modal-error').textContent=e.message;});
 }
 function token(){const value=demo?'demo':widget!==null?window.turnstile?.getResponse(widget):'';if(!value)throw new Error('Please complete bot verification first.');return value;}
-function booking(s){const content=modal('Reserve this match'),form=element('form');content.append(element('p',`${formatFull(s.start,zone)} – ${formatTime(s.end,zone)} · ${(s.end-s.start)/60000} minutes`),form);field(form,'Team name','team');field(form,'Discord username','discord');form.append(element('p','Your team and Discord username are shared only with the organizer. Your reservation is immediate.'));challenge(form);submit(form,'Reserve match',async data=>{await api('/book','POST',{id:s.id,team:data.get('team'),discord:data.get('discord'),token:token()},true);success(demo?'Preview reservation saved':'You’re booked.',demo?'This only changed sample data in this tab.':'The organizer will receive your details on Discord and can forward your private cancellation link.');});}
+function booking(s){
+  const content=modal('Reserve this match'),form=element('form');
+  content.append(element('p',`${formatFull(s.start,zone)} – ${formatTime(s.end,zone)} · ${(s.end-s.start)/60000} minutes`),form);
+  field(form,'Team name','team');field(form,'Discord username','discord');
+  form.append(element('p','Your team and Discord username are shared only with the organizer. Your reservation is immediate.'));
+  const notice=element('p');notice.setAttribute('role','status');form.append(notice);challenge(form);
+  const button=submit(form,'Reserve match',async data=>{
+    try{await api('/book','POST',{id:s.id,team:data.get('team'),discord:data.get('discord'),token:token()},true);}
+    catch(error){if(error.status===409)await load(true);throw error;}
+    success(demo?'Preview reservation saved':'Match reserved',demo?'This only changed sample data in this tab.':'The organizer will receive your details on Discord and can forward your private cancellation link.');
+  });
+  activeBooking={id:s.id,button,notice};load(true);
+}
 function conflict(){const content=modal('Let’s find another time'),form=element('form');content.append(element('p','Tell us when your team is free. The organizer will reach out on Discord.'),form);field(form,'Team name','team');field(form,'Discord username','discord');const m=field(form,'Preferred dates, times, timezone, and any notes','message','textarea',1000);m.placeholder='For example: Tuesday Oct 13, 7–9 PM Central, or Thursday after 8 PM.';challenge(form);submit(form,'Send availability',async data=>{await api('/conflict','POST',{team:data.get('team'),discord:data.get('discord'),message:data.get('message'),token:token()},true);success('Availability received.',demo?'Preview only — no Discord message was sent.':'Your request is saved. The organizer will follow up on Discord to find a time.');});}
-function add(selectedDate,selectedTime){const content=modal('Add availability'),form=element('form');content.append(element('p',`Choose one complete match block. Times are in ${zone}.`),form);const date=field(form,'Date','date','date',0);date.value=selectedDate||(week<dateKey(Date.now(),zone)?dateKey(Date.now(),zone):week);date.min=dateKey(Date.now(),zone);const time=field(form,'Start time','time','time',0);time.value=selectedTime||'18:00';const l=element('label','Match length'),duration=element('select');duration.name='duration';for(const n of [45,60]){const o=element('option',`${n} minutes`);o.value=n;duration.append(o);}l.append(duration);form.append(l);submit(form,'Add slot',async data=>{const start=localInstant(data.get('date'),data.get('time'),zone),end=start+Number(data.get('duration'))*60000;if(start<=Date.now())throw new Error('Choose a time in the future.');await api('/admin/slots','POST',{start,end});week=monday(data.get('date'));close();await load();});}
+function add(selectedDate,selectedTime){
+  const content=modal('Add slot or match'),form=element('form');
+  content.append(element('p',`Times are in ${zone}.`),form);
+  const kindLabel=element('label','Slot type'),kind=element('select');kind.name='kind';
+  for(const [value,label] of [['available','Open availability'],['booked','Already-booked match']]){const option=element('option',label);option.value=value;kind.append(option);}
+  kindLabel.append(kind);form.append(kindLabel);
+  const date=field(form,'Date','date','date',0);date.value=selectedDate||(week<dateKey(Date.now(),zone)?dateKey(Date.now(),zone):week);date.min=dateKey(Date.now(),zone);
+  const time=field(form,'Start time','time','time',0);time.value=selectedTime||'18:00';
+  const l=element('label','Match length'),duration=element('select');duration.name='duration';
+  for(const n of [45,60]){const o=element('option',`${n} minutes`);o.value=n;duration.append(o);}l.append(duration);form.append(l);
+  const details=element('div'),team=field(details,'Opponent team','team'),discord=field(details,'Discord username (optional)','discord');
+  discord.required=false;form.append(details);
+  const updateFields=()=>{const booked=kind.value==='booked';details.hidden=!booked;team.disabled=!booked;discord.disabled=!booked;};
+  kind.addEventListener('change',updateFields);updateFields();
+  submit(form,'Save',async data=>{
+    const start=localInstant(data.get('date'),data.get('time'),zone),end=start+Number(data.get('duration'))*60000;
+    if(start<=Date.now())throw new Error('Choose a time in the future.');
+    const booked=data.get('kind')==='booked';
+    await api('/admin/slots','POST',{start,end,booked,...(booked?{team:data.get('team'),discord:data.get('discord')}: {})});
+    week=monday(data.get('date'));close();await load();updateAdmin();
+  });
+}
 function manage(s){const content=modal(s.team?'Booked match':'Available block');content.append(element('p',`${formatFull(s.start,zone)} – ${formatTime(s.end,zone)}`));if(s.team){content.append(element('p',`Team: ${s.team}\nDiscord: ${s.discord}`,'detail'));if(s.cancel_token){const a=element('a','Private cancellation link','booking-link');a.href=`${location.origin}${location.pathname}#cancel=${s.cancel_token}`;content.append(a);}const reopen=element('button','Cancel booking & reopen slot');reopen.addEventListener('click',()=>confirmAction('Cancel this booking?','The slot will become available again. You’ll receive a Discord notification; please tell the opposing team.',()=>api('/admin/cancel','POST',{id:s.id})));actions(content,reopen);}
   const remove=element('button','Delete slot','danger');remove.addEventListener('click',()=>confirmAction('Delete this slot?',s.team?'This cancels the booking and removes availability. Please notify the opposing team.':'This availability block will be removed.',()=>api(`/admin/slots/${s.id}`,'DELETE')));actions(content,remove);
 }
 function confirmAction(title,message,action){const content=modal(title),form=element('form');content.append(element('p',message),form);submit(form,'Confirm',async()=>{await action();close();await load();updateAdmin();});}
 async function cancellation(){const t=location.hash.match(/^#cancel=([a-f0-9]{64})$/)?.[1];if(!t)return;history.replaceState(null,'',location.pathname+location.search);const content=modal('Your booking');content.append(element('p','Loading booking…'));try{const {slot}=await api('/cancellation','POST',{token:t},true);confirmAction('Cancel this match?',`${slot.team} · ${formatFull(slot.start,zone)}. Cancelling reopens the slot for another team.`,async()=>{await api('/cancel','POST',{token:t},true);});}catch(e){content.replaceChildren(element('h2','Booking unavailable'),element('p',e.message));}}
-$('login').addEventListener('click',()=>{const content=modal('Team admin'),form=element('form');content.append(element('p',demo?'Preview login: use any password.':'Sign in to manage Illinois Orange availability.'),form);const password=field(form,'Password','password','password',256);password.autocomplete='current-password';submit(form,'Log in',async data=>{session=(await api('/login','POST',{password:data.get('password')})).token;preview=false;password.value='';close();updateAdmin();await load();});});
+$('login').addEventListener('click',()=>{
+  const content=modal('Team admin'),form=element('form');
+  content.append(element('p',demo?'Preview login: use any password.':'Sign in to manage Illinois Orange availability.'),form);
+  const password=field(form,'Password','password','password',256);
+  password.autocomplete='current-password';password.spellcheck=false;password.id='admin-password';
+  const toggle=element('button','Show password');toggle.type='button';
+  toggle.setAttribute('aria-controls','admin-password');toggle.setAttribute('aria-pressed','false');
+  toggle.addEventListener('click',()=>{const show=password.type==='password';password.type=show?'text':'password';toggle.textContent=show?'Hide password':'Show password';toggle.setAttribute('aria-pressed',String(show));});
+  form.append(toggle);
+  submit(form,'Log in',async data=>{session=(await api('/login','POST',{password:data.get('password')})).token;preview=false;password.value='';close();updateAdmin();await load();});
+});
 $('logout').addEventListener('click',async()=>{try{await api('/logout','POST',{});session='';preview=false;updateAdmin();load();}catch(e){$('status').textContent=e.message;}});
 $('preview').addEventListener('click',()=>{preview=!preview;updateAdmin();load();});
 $('add').addEventListener('click',()=>add());$('conflict').addEventListener('click',conflict);$('close').addEventListener('click',close);
 $('modal').addEventListener('cancel',e=>{e.preventDefault();close();});
 for(const [id,delta] of [['previous',-7],['next',7]])$(id).addEventListener('click',()=>{week=addDays(week,delta);load();});
-$('today').addEventListener('click',()=>{week=monday(dateKey(Date.now(),zone));load();});$('refresh').addEventListener('click',load);
+$('today').addEventListener('click',()=>{week=monday(dateKey(Date.now(),zone));load();});$('refresh').addEventListener('click',()=>load());
 $('timezone').addEventListener('change',e=>{zone=e.target.value;load();});
 window.addEventListener('hashchange',cancellation);
+// Refresh visible calendars without clearing forms or moving the user's scroll.
+const refreshVisible=()=>{if(!document.hidden)load(true);};
+setInterval(refreshVisible,15000);
+document.addEventListener('visibilitychange',refreshVisible);
+window.addEventListener('focus',refreshVisible);
+window.addEventListener('online',refreshVisible);
 $('demo-banner').hidden=!demo;updateAdmin();load();cancellation();

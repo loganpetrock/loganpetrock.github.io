@@ -59,17 +59,5 @@ window.PROJECTS = [
     demo: "",
     image: "",
     imageAlt: "",
-  },
-  {
-    title: "Camera Gear Detector",
-    id: "camera-gear-detector",
-    date: "December 2025",
-    summary: "Real-time equipment recognition",
-    description: "A real-time computer vision system that identifies equipment in my photography setup. Runs a YOLO11s model through ONNX Runtime and DirectML for inference accelerated by AMD GPUs.",
-    technologies: ["Python", "YOLO11s", "ONNX Runtime", "DirectML"],
-    github: "https://github.com/loganpetrock/CameraGearDetector",
-    demo: "",
-    image: "",
-    imageAlt: "",
   }
 ];

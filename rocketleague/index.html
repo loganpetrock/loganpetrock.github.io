@@ -4,16 +4,17 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; frame-src https://challenges.cloudflare.com; connect-src 'self' https://*.workers.dev https://challenges.cloudflare.com; img-src 'self' data:; base-uri 'self'; form-action 'none'; object-src 'none'">
-  <title>Match scheduling · Illinois Orange</title>
-  <link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="./scheduler.css">
+  <title>Match scheduling · Illinois Fighting Illini Orange</title>
+  <link rel="icon" type="image/png" href="/assets/pet-rock.png">
+  <link rel="stylesheet" href="./scheduler.css">
   <script src="./config.js" defer></script><script src="./scheduler.mjs" type="module"></script>
 </head>
 <body>
   <a class="skip" href="#calendar">Skip to schedule</a>
-  <header><div class="brand"><span>ILLINOIS ORANGE <small>ROCKET LEAGUE</small></span></div><div class="actions"><button id="preview" hidden>Preview public view</button><button id="login">Admin login ↗</button><button id="logout" hidden>Log out</button></div></header>
+  <header><div class="brand"><span>ILLINOIS FIGHTING ILLINI ORANGE <small>ROCKET LEAGUE</small></span></div><div class="actions"><button id="preview" hidden>Preview public view</button><button id="login">Admin login ↗</button><button id="logout" hidden>Log out</button></div></header>
   <main>
     <div id="demo-banner" class="banner" hidden>Interactive preview · Sample data only. Nothing is saved or sent to Discord.</div>
-    <section class="intro"><p class="eyebrow">UNIVERSITY OF ILLINOIS · ROCKET LEAGUE</p><h1>Match schedule<span>.</span></h1><p>Pick a time that works for your team!</p></section>
+    <section class="intro"><p class="eyebrow">ILLINOIS FIGHTING ILLINI · ROCKET LEAGUE</p><h1>Match schedule<span>.</span></h1><p>Pick a time that works for your team!</p></section>
     <div id="admin-bar" class="admin-bar" hidden><div><strong>Team calendar</strong><span id="notification-status">Manage your availability below.</span></div><div class="admin-actions"><button id="discord-test">Test Discord DM</button><button id="add" class="primary">+ Add slot or match</button></div></div>
     <section class="schedule" aria-label="Weekly match schedule">
       <div class="toolbar"><div class="week-nav"><button id="previous" aria-label="Previous week">←</button><button id="next" aria-label="Next week">→</button><h2 id="week-label"></h2><button id="today">Today</button></div><label class="zone-label">All times in <select id="timezone" aria-label="Calendar timezone"><option value="America/Chicago">Central · Chicago</option><option value="America/New_York">Eastern · New York</option><option value="America/Denver">Mountain · Denver</option><option value="America/Los_Angeles">Pacific · Los Angeles</option></select><span id="zone-abbreviation"></span></label></div>
@@ -23,7 +24,7 @@
       <div class="schedule-bottom"><p>Choose an available block to book. Schedule updates automatically.</p><button id="refresh">Refresh schedule ↻</button></div>
     </section>
     <section class="alternative"><div><h2>Need a different time?</h2><p>Share your team’s availability and we’ll contact you on Discord.</p></div><button id="conflict">Suggest another time ↗</button></section>
-    <footer>University of Illinois Orange Rocket League <span>University of Illinois Urbana-Champaign</span></footer>
+    <footer>Illinois Fighting Illini Rocket League <span>University of Illinois Urbana-Champaign</span></footer>
   </main>
   <dialog id="modal"><button id="close" class="close" aria-label="Close dialog">×</button><div id="modal-content"></div><p id="modal-error" role="alert"></p></dialog>
 </body></html>

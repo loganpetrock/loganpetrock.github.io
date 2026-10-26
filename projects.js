@@ -4,6 +4,22 @@
 // Use double quotes around text and a comma between each project object.
 window.PROJECTS = [
   {
+  title: "16-bit SLC-3 Microprocessor on FPGA",
+  id: "slc3-fpga-microprocessor",
+  date: "October 2026",
+  summary: "SystemVerilog CPU implemented on a Spartan-7 FPGA",
+  description: "Designed and synthesized a 16-bit SLC-3 microprocessor in SystemVerilog for a Xilinx Spartan-7 FPGA, including the datapath, ALU, register file, memory-mapped I/O, instruction decoder, and multi-cycle finite-state control unit.",
+  details: [
+    "Created SystemVerilog testbenches and used Vivado behavioral and post-synthesis timing simulations to verify the fetch, decode, and execution cycle and resolve timing violations.",
+    "Implemented arithmetic, logic, control-flow, and memory instructions—including ADD, AND, NOT, BR, JMP, JSR, LDR, and STR—with physical switches and hexadecimal displays connected through memory-mapped I/O.",
+  ],
+  technologies: ["SystemVerilog", "Xilinx Vivado", "Spartan-7 FPGA", "Computer Architecture"],
+  github: "",
+  demo: "",
+  image: "",
+  imageAlt: "",
+},
+  {
     title: "Spotify Media Controller",
     id: "spotify-media-controller",
     date: "June 2026",
@@ -44,4 +60,16 @@ window.PROJECTS = [
     image: "",
     imageAlt: "",
   },
+  {
+    title: "Camera Gear Detector",
+    id: "camera-gear-detector",
+    date: "December 2025",
+    summary: "Real-time equipment recognition",
+    description: "A real-time computer vision system that identifies equipment in my photography setup. Runs a YOLO11s model through ONNX Runtime and DirectML for inference accelerated by AMD GPUs.",
+    technologies: ["Python", "YOLO11s", "ONNX Runtime", "DirectML"],
+    github: "https://github.com/loganpetrock/CameraGearDetector",
+    demo: "",
+    image: "",
+    imageAlt: "",
+  }
 ];
